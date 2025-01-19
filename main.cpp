@@ -102,10 +102,10 @@ int main() {
 		if (_kbhit()) {
 			char key = _getch();
 			switch (key) {
-			case 'w': if (DVD.ypos != 1) y--; break;
-			case 's': if (DVD.xpos != height - 1 - DVD.height) y++; break;
-			case 'a': if (DVD.ypos != 1) x--; break;
-			case 'd': if (DVD.xpos != width - 1 - DVD.width) x++; break;
+			case 'w': if (DVD.ypos != 1) DVD.ypos--; break;
+			case 's': if (DVD.ypos != height - 1 - DVD.height) DVD.ypos++; break;
+			case 'a': if (DVD.xpos != 1) DVD.xpos--; break;
+			case 'd': if (DVD.xpos != width - 1 - DVD.width) DVD.xpos++; break;
 			}
 		}
 
