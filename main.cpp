@@ -4,19 +4,22 @@
 #include <vector>
 #include <thread>
 #include <conio.h>
+#include <string>
 
 class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
 	int width, height;
 	int xpos, ypos;
+	std::string color;
 
-	void setTexture(std::vector<std::vector<char>> VVtexture, int Iwidth, int Iheight, int xpos = 0, int ypos = 0) {
+	void setTexture(std::vector<std::vector<char>> VVtexture, int Iwidth, int Iheight, std::string color = "original", int xpos = 0, int ypos = 0) {
 		this->texture = VVtexture;
 		this->width = Iwidth;
 		this->height = Iheight;
 		this->xpos = xpos;
 		this->ypos = ypos;
+		this->color = color;
 	}
 };
 
@@ -38,29 +41,38 @@ public:
 		SetConsoleCursorPosition(consoleHandle, position);
 	}
 
-	void drawChar(int x, int y, char ch) {
+	void drawChar(int x, int y, char ch, std::string color = "original") {
+		std::string colorCode;
+		if (color == "original") colorCode = "\033[0m";
+		else if (color == "red") colorCode = "\033[31m";
+		else if (color == "green") colorCode = "\033[32m";
+		else if (color == "yellow") colorCode = "\033[33m";
+		else if (color == "blue") colorCode = "\033[34m";
+		else if (color == "magenta") colorCode = "\033[35m";
+		else if (color == "cyan") colorCode = "\033[36m";
+		else if (color == "white") colorCode = "\033[37m";
 		setCursorPosition(x, y);
-		std::cout << ch;
+		std::cout << colorCode << ch;
 	}
 
-	void drawBorder(int width, int height) {
+	void drawBorder(int width, int height, std::string color) {
 		// Draw top and bottom borders
 		for (int x = 0; x < width; x++) {
-			drawChar(x, 0, '#'); // Top border
-			drawChar(x, height - 1, '#'); // Bottom border
+			drawChar(x, 0, '#', color); // Top border
+			drawChar(x, height - 1, '#', color); // Bottom border
 		}
 
 		// Draw left and right borders
 		for (int y = 0; y < height; y++) {
-			drawChar(0, y, '#'); // Left border
-			drawChar(width - 1, y, '#'); // Right border
+			drawChar(0, y, '#', color); // Left border
+			drawChar(width - 1, y, '#', color); // Right border
 		}
 	}
 
 	void printSprite(Sprite& sprite) {
 		for (int dy = 0; dy < sprite.height; dy++) {
 			for (int dx = 0; dx < sprite.width; dx++) {
-				drawChar(sprite.xpos + dx, sprite.ypos + dy, sprite.texture[dy][dx]);
+				drawChar(sprite.xpos + dx, sprite.ypos + dy, sprite.texture[dy][dx], sprite.color);
 			}
 		}
 	}
@@ -115,12 +127,12 @@ int main() {
 	Sprite DVD;
 	std::vector<std::vector<char>> dvdTexture = { {'D', 'V', 'D'} };
 	const int x = 1, y = 1;
-	DVD.setTexture(dvdTexture, dvdTexture[0].size(), dvdTexture.size(), x, y);
+	DVD.setTexture(dvdTexture, dvdTexture[0].size(), dvdTexture.size(), "blue", x, y);
 
 	system("cls");
 	while (true) {
 		auto frameStart = std::chrono::steady_clock::now();
-		renderer.drawBorder(width, height);
+		renderer.drawBorder(width, height, "red");
 
 		//Game Code Starts
 		renderer.clearSprite(DVD);
