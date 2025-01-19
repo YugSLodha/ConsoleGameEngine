@@ -9,11 +9,14 @@ class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
 	int width, height;
+	int xpos, ypos;
 
-	void setTexture(std::vector<std::vector<char>> VVtexture, int Iwidth, int Iheight) {
+	void setTexture(std::vector<std::vector<char>> VVtexture, int Iwidth, int Iheight, int xpos = 0, int ypos = 0) {
 		this->texture = VVtexture;
 		this->width = Iwidth;
 		this->height = Iheight;
+		this->xpos = xpos;
+		this->ypos = ypos;
 	}
 };
 
@@ -54,18 +57,18 @@ public:
 		}
 	}
 
-	void printSprite(int x, int y, Sprite& sprite) {
+	void printSprite(Sprite& sprite) {
 		for (int dy = 0; dy < sprite.height; dy++) {
 			for (int dx = 0; dx < sprite.width; dx++) {
-				drawChar(x + dx, y + dy, sprite.texture[dy][dx]);
+				drawChar(sprite.xpos + dx, sprite.ypos + dy, sprite.texture[dy][dx]);
 			}
 		}
 	}
 
-	void clearSprite(int x, int y, Sprite& sprite) {
+	void clearSprite(Sprite& sprite) {
 		for (int dy = 0; dy < sprite.height; dy++) {
 			for (int dx = 0; dx < sprite.width; dx++) {
-				drawChar(x + dx, y + dy, ' ');
+				drawChar(sprite.xpos + dx, sprite.ypos + dy, ' ');
 			}
 		}
 	}
@@ -80,12 +83,12 @@ int main() {
 
 	Renderer renderer;
 
-	std::vector<std::vector<char>> dvdTexture = { {'D', 'V', 'D'} };
-
 	Sprite DVD;
-	DVD.setTexture(dvdTexture, 3, 1);
+	std::vector<std::vector<char>> dvdTexture = { {'D', 'V', 'D'} };
+	const int x = 1, y = 1;
 
-	int x = 1, y = 1;
+	DVD.setTexture(dvdTexture, 3, 1, x, y, FPS);
+
 	int dx = 1, dy = 1;
 
 	system("cls");
@@ -94,19 +97,19 @@ int main() {
 		renderer.drawBorder(width, height);
 
 		//Game Code Starts
-		renderer.clearSprite(x, y, DVD);
+		renderer.clearSprite(DVD);
 
 		if (_kbhit()) {
 			char key = _getch();
 			switch (key) {
-			case 'w': if (y != 1) y--; break;
-			case 's': if (y != height - 1 - DVD.height) y++; break;
-			case 'a': if (x != 1) x--; break;
-			case 'd': if (x != width - 1 - DVD.width) x++; break;
+			case 'w': if (DVD.ypos != 1) y--; break;
+			case 's': if (DVD.xpos != height - 1 - DVD.height) y++; break;
+			case 'a': if (DVD.ypos != 1) x--; break;
+			case 'd': if (DVD.xpos != width - 1 - DVD.width) x++; break;
 			}
 		}
 
-		renderer.printSprite(x, y, DVD);
+		renderer.printSprite(DVD);
 		//Game Code Ends
 
 		auto frameEnd = std::chrono::steady_clock::now();
