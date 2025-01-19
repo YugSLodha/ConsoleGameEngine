@@ -74,22 +74,48 @@ public:
 	}
 };
 
+class Input {
+public:
+	bool isKeyPressed(char key) {
+		if (_kbhit()) {
+			char pressedKey = _getch();
+			if (pressedKey == key) return true;
+		}
+		return false;
+	}
+
+	char getKey() {
+		if (_kbhit()) {
+			return _getch();
+		}
+		return '\0';
+	}
+
+	void simpleMovementLogic(Sprite& sprite, int sHeight, int sWidth, int bSize = 1) {
+		switch (getKey()) {
+		case 'w': if (sprite.ypos > bSize) sprite.ypos--; break;
+		case 'a': if (sprite.xpos > bSize) sprite.xpos--; break;
+		case 's': if (sprite.ypos + sprite.height < sHeight - bSize) sprite.ypos++; break;
+		case 'd': if (sprite.xpos + sprite.width < sWidth - bSize) sprite.xpos++; break;
+		}
+	}
+};
+
 int main() {
+	// Screen Setup
 	const int width = 156;
 	const int height = 41;
-
 	const int FPS = 30;
 	const int frameDuration = 1000 / FPS;
 
 	Renderer renderer;
+	Input input;
 
+	// DVD Sprite Setup
 	Sprite DVD;
 	std::vector<std::vector<char>> dvdTexture = { {'D', 'V', 'D'} };
 	const int x = 1, y = 1;
-
-	DVD.setTexture(dvdTexture, 3, 1, x, y);
-
-	int dx = 1, dy = 1;
+	DVD.setTexture(dvdTexture, dvdTexture[0].size(), dvdTexture.size(), x, y);
 
 	system("cls");
 	while (true) {
@@ -99,15 +125,7 @@ int main() {
 		//Game Code Starts
 		renderer.clearSprite(DVD);
 
-		if (_kbhit()) {
-			char key = _getch();
-			switch (key) {
-			case 'w': if (DVD.ypos != 1) DVD.ypos--; break;
-			case 's': if (DVD.ypos != height - 1 - DVD.height) DVD.ypos++; break;
-			case 'a': if (DVD.xpos != 1) DVD.xpos--; break;
-			case 'd': if (DVD.xpos != width - 1 - DVD.width) DVD.xpos++; break;
-			}
-		}
+		input.simpleMovementLogic(DVD, height, width);
 
 		renderer.printSprite(DVD);
 		//Game Code Ends
