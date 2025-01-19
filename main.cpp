@@ -87,7 +87,7 @@ int main() {
 	std::vector<std::vector<char>> dvdTexture = { {'D', 'V', 'D'} };
 	const int x = 1, y = 1;
 
-	DVD.setTexture(dvdTexture, 3, 1, x, y, FPS);
+	DVD.setTexture(dvdTexture, 3, 1, x, y);
 
 	int dx = 1, dy = 1;
 
