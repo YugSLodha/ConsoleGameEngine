@@ -87,19 +87,18 @@ public:
 
 class Input {
 public:
-	bool isKeyPressed(char key) {
-		if (_kbhit()) {
-			char pressedKey = _getch();
-			if (pressedKey == key) return true;
-		}
-		return false;
-	}
-
 	char getKey() {
 		if (_kbhit()) {
 			return _getch();
 		}
 		return '\0';
+	}
+
+	bool isKeyPressed(char key, int code) {
+		if (GetAsyncKeyState(key) & code) {
+			return true;
+		}
+		return false;
 	}
 
 	void simpleMovementLogic(Sprite& sprite, int sHeight, int sWidth, int bSize = 1) {
@@ -134,8 +133,9 @@ int main() {
 		renderer.clearSprite(shooter);
 
 		input.simpleMovementLogic(shooter, height, width);
-
-		// TODO REWRITE INPUT CLASS WITH WINDOWS API
+		if (input.isKeyPressed(VK_SPACE, 0x8000)) {
+			shooter.color = "green";
+		}
 
 		renderer.printSprite(shooter);
 		//Game Code Ends
