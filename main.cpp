@@ -1,8 +1,8 @@
 #include <iostream>
 #include <windows.h>
 #include <chrono>
-#include <vector>
 #include <thread>
+#include <vector>
 #include <conio.h>
 #include <string>
 
@@ -56,23 +56,22 @@ public:
 	}
 
 	void drawBorder(int width, int height, std::string color) {
-		// Draw top and bottom borders
 		for (int x = 0; x < width; x++) {
-			drawChar(x, 0, '#', color); // Top border
-			drawChar(x, height - 1, '#', color); // Bottom border
+			drawChar(x, 0, '#', color);
+			drawChar(x, height - 1, '#', color);
 		}
 
 		// Draw left and right borders
 		for (int y = 0; y < height; y++) {
-			drawChar(0, y, '#', color); // Left border
-			drawChar(width - 1, y, '#', color); // Right border
+			drawChar(0, y, '#', color);
+			drawChar(width - 1, y, '#', color);
 		}
 	}
 
 	void printSprite(Sprite& sprite) {
-		for (int dy = 0; dy < sprite.height; dy++) {
-			for (int dx = 0; dx < sprite.width; dx++) {
-				drawChar(sprite.xpos + dx, sprite.ypos + dy, sprite.texture[dy][dx], sprite.color);
+		for (int y = 0; y < sprite.height; y++) {
+			for (int x = 0; x < sprite.width; x++) {
+				drawChar(sprite.xpos + x, sprite.ypos + y, sprite.texture[y][x], sprite.color);
 			}
 		}
 	}
@@ -114,40 +113,32 @@ public:
 };
 
 int main() {
-	// Screen Setup
-	const int width = 156;
-	const int height = 41;
-	const int FPS = 30;
-	const int frameDuration = 1000 / FPS;
+	const int width = 30;
+	const int height = 20;
 
 	Renderer renderer;
 	Input input;
 
-	// DVD Sprite Setup
-	Sprite DVD;
-	std::vector<std::vector<char>> dvdTexture = { {'D', 'V', 'D'} };
+	Sprite shooter;
+	std::vector<std::vector<char>> shooterTexture = { {'-', '-', '\\'},
+													  {' ', ' ', '>',},
+													  {'-', '-', '/',} };
 	const int x = 1, y = 1;
-	DVD.setTexture(dvdTexture, dvdTexture[0].size(), dvdTexture.size(), "blue", x, y);
+	shooter.setTexture(shooterTexture, shooterTexture[0].size(), shooterTexture.size(), "blue", x, y);
 
 	system("cls");
 	while (true) {
-		auto frameStart = std::chrono::steady_clock::now();
 		renderer.drawBorder(width, height, "red");
 
 		//Game Code Starts
-		renderer.clearSprite(DVD);
+		renderer.clearSprite(shooter);
 
-		input.simpleMovementLogic(DVD, height, width);
+		input.simpleMovementLogic(shooter, height, width);
 
-		renderer.printSprite(DVD);
+		// TODO REWRITE INPUT CLASS WITH WINDOWS API
+
+		renderer.printSprite(shooter);
 		//Game Code Ends
-
-		auto frameEnd = std::chrono::steady_clock::now();
-		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart).count();
-
-		if (elapsed < frameDuration) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(frameDuration - elapsed));
-		}
 	}
 
 	return 0;
