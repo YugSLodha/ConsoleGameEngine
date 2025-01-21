@@ -10,7 +10,7 @@ public:
 };
 
 int main() {
-	const int FPS = 60;
+	const int FPS = 1;
 	const int frameDuration = 1000 / FPS;
 	const int width = 30;
 	const int height = 20;
@@ -19,6 +19,7 @@ int main() {
 
 	Renderer renderer;
 	Input input;
+	FpsManager fps(FPS);
 
 	Sprite shooter;
 	std::vector<std::vector<char>> shooterTexture = { {'-', '-', '\\'},
@@ -31,18 +32,13 @@ int main() {
 
 	clearScreen();
 	while (true) {
-		auto frameStart = std::chrono::high_resolution_clock::now();
-
-		// Draw the border
 		renderer.drawBorder(width, height, "magenta");
 
 		// Game Code Starts
 		renderer.clearSprite(shooter);
 
-		// Handle shooter movement
 		input.simpleMovementLogic(shooter, height, width);
 
-		// Handle shooting
 		static auto lastBulletTime = std::chrono::high_resolution_clock::now();
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastBulletTime).count();
@@ -55,7 +51,6 @@ int main() {
 			bullets.push_back(bullet);
 		}
 
-		// Update and render bullets
 		for (auto it = bullets.begin(); it != bullets.end();) {
 			renderer.clearSprite(*it);
 			it->xpos += 1;
@@ -68,17 +63,11 @@ int main() {
 			}
 		}
 
-		// Render the shooter
 		renderer.printSprite(shooter);
 
 		// Game Code Ends
 
-		auto frameEnd = std::chrono::high_resolution_clock::now();
-		auto frameTime = std::chrono::duration_cast<std::chrono::milliseconds>(frameEnd - frameStart).count();
-
-		if (frameTime < frameDuration) {
-			std::this_thread::sleep_for(std::chrono::milliseconds(frameDuration - frameTime));
-		}
+		fps.regulate();
 	}
 	return 0;
 }

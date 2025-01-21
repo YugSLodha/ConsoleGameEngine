@@ -129,3 +129,37 @@ public:
 		return xOverlap && yOverlap;
 	}
 };
+
+#include <chrono>
+#include <thread>
+
+class FpsManager {
+private:
+	int targetFps; // Target frames per second
+	std::chrono::time_point<std::chrono::steady_clock> lastFrameTime;
+
+public:
+	// Constructor
+	FpsManager(int fps) : targetFps(fps) {
+		lastFrameTime = std::chrono::steady_clock::now();
+	}
+
+	// Function to regulate FPS
+	void regulate() {
+		using namespace std::chrono;
+
+		// Calculate the target frame duration
+		auto targetFrameDuration = duration<double>(1.0 / targetFps);
+
+		// Measure the time elapsed since the last frame
+		auto currentTime = steady_clock::now();
+		auto elapsedTime = duration_cast<duration<double>>(currentTime - lastFrameTime);
+
+		if (elapsedTime < targetFrameDuration) {
+			auto sleepDuration = targetFrameDuration - elapsedTime;
+			std::this_thread::sleep_for(sleepDuration);
+		}
+
+		lastFrameTime = steady_clock::now();
+	}
+};
