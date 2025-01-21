@@ -6,6 +6,11 @@
 #include <conio.h>
 #include <string>
 
+int clearScreen() {
+	system("cls");
+	return 0;
+}
+
 class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
@@ -51,6 +56,7 @@ public:
 		else if (color == "magenta") colorCode = "\033[35m";
 		else if (color == "cyan") colorCode = "\033[36m";
 		else if (color == "white") colorCode = "\033[37m";
+		else colorCode = "\033[0m";
 		setCursorPosition(x, y);
 		std::cout << colorCode << ch;
 	}
@@ -108,5 +114,18 @@ public:
 		case 's': if (sprite.ypos + sprite.height < sHeight - bSize) sprite.ypos++; break;
 		case 'd': if (sprite.xpos + sprite.width < sWidth - bSize) sprite.xpos++; break;
 		}
+	}
+};
+
+class Collision {
+public:
+	bool isColliding(const Sprite& sprite1, const Sprite& sprite2) {
+		// Check for overlap between the bounding boxes of the two sprites
+		bool xOverlap = sprite1.xpos < sprite2.xpos + sprite2.width &&
+			sprite1.xpos + sprite1.width > sprite2.xpos;
+		bool yOverlap = sprite1.ypos < sprite2.ypos + sprite2.height &&
+			sprite1.ypos + sprite1.height > sprite2.ypos;
+
+		return xOverlap && yOverlap;
 	}
 };

@@ -29,7 +29,7 @@ int main() {
 
 	std::vector<std::vector<char>> bulletTexture = { {'.'} };
 
-	system("cls");
+	clearScreen();
 	while (true) {
 		auto frameStart = std::chrono::high_resolution_clock::now();
 
