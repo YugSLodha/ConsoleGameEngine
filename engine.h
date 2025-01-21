@@ -130,9 +130,6 @@ public:
 	}
 };
 
-#include <chrono>
-#include <thread>
-
 class FpsManager {
 private:
 	int targetFps; // Target frames per second
