@@ -9,10 +9,30 @@ class Bullet : public Sprite {
 public:
 };
 
+void handleBullets(std::vector<Bullet>& bullets, Sprite& enemy, Renderer& renderer, Collision& collision, int width) {
+	for (auto it = bullets.begin(); it != bullets.end();) {
+		renderer.clearSprite(*it);
+		it->xpos += 1;
+
+		if (it->xpos >= width - 1) {
+			it = bullets.erase(it);
+		}
+		else if (collision.isColliding(*it, enemy)) {
+			std::cout << "Collision detected! Game Over.\n";
+			exit(0);
+		}
+		else {
+			renderer.printSprite(*it);
+			++it;
+		}
+	}
+}
+
+
 int main() {
-	const int FPS = 1;
+	const int FPS = 30;
 	const int frameDuration = 1000 / FPS;
-	const int width = 30;
+	const int width = 50;
 	const int height = 20;
 	int bulletCount = 0;
 	std::vector<Bullet> bullets;
@@ -20,6 +40,7 @@ int main() {
 	Renderer renderer;
 	Input input;
 	FpsManager fps(FPS);
+	Collision collision;
 
 	Sprite shooter;
 	std::vector<std::vector<char>> shooterTexture = { {'-', '-', '\\'},
@@ -30,12 +51,17 @@ int main() {
 
 	std::vector<std::vector<char>> bulletTexture = { {'.'} };
 
+	Sprite enemy1;
+	std::vector<std::vector<char>> enemy1Texture = { {'<', '-', '-'} };
+	enemy1.setTexture("enemy1", enemy1Texture, enemy1Texture[0].size(), enemy1Texture.size(), "yellow", 40, 3);
+
 	clearScreen();
 	while (true) {
 		renderer.drawBorder(width, height, "magenta");
 
 		// Game Code Starts
 		renderer.clearSprite(shooter);
+		renderer.clearSprite(enemy1);
 
 		input.simpleMovementLogic(shooter, height, width);
 
@@ -51,19 +77,10 @@ int main() {
 			bullets.push_back(bullet);
 		}
 
-		for (auto it = bullets.begin(); it != bullets.end();) {
-			renderer.clearSprite(*it);
-			it->xpos += 1;
-			if (it->xpos >= width - 1) {
-				it = bullets.erase(it); // Remove bullet if out of bounds
-			}
-			else {
-				renderer.printSprite(*it);
-				++it;
-			}
-		}
+		handleBullets(bullets, enemy1, renderer, collision, width);
 
 		renderer.printSprite(shooter);
+		renderer.printSprite(enemy1);
 
 		// Game Code Ends
 
