@@ -1,90 +1,83 @@
 #include "engine.h"
 #include <vector>
-#include <string>
-#include <iostream>
-#include <chrono>
-#include <thread>
 
-class Bullet : public Sprite {
-public:
-};
+void setBGTexture(Background& background, int width, int height) {
+	// Shift columns leftward
+	for (int x = 0; x < width - 1; ++x) {
+		for (int y = 0; y < height; ++y) {
+			background.texture[y][x] = background.texture[y][x + 1];
+		}
+	}
 
-void handleBullets(std::vector<Bullet>& bullets, Sprite& enemy, Renderer& renderer, Collision& collision, int width) {
-	for (auto it = bullets.begin(); it != bullets.end();) {
-		renderer.clearSprite(*it);
-		it->xpos += 1;
-
-		if (it->xpos >= width - 1) {
-			it = bullets.erase(it);
-		}
-		else if (collision.isColliding(*it, enemy)) {
-			std::cout << "Collision detected! Game Over.\n";
-			exit(0);
-		}
-		else {
-			renderer.printSprite(*it);
-			++it;
-		}
+	// Generate a new rightmost column
+	for (int y = 0; y < height; ++y) {
+		background.texture[y][width - 1] = (randomNumber(0, 10) < 2) ? '*' : ' ';
 	}
 }
 
-
 int main() {
 	const int FPS = 30;
-	const int frameDuration = 1000 / FPS;
 	const int width = 50;
 	const int height = 20;
-	int bulletCount = 0;
-	std::vector<Bullet> bullets;
 
-	Renderer renderer;
+	Renderer renderer(width, height);
 	Input input;
 	FpsManager fps(FPS);
-	Collision collision;
 
 	Sprite shooter;
-	std::vector<std::vector<char>> shooterTexture = { {'-', '-', '\\'},
-													  {' ', ' ', '>'},
-													  {'-', '-', '/'} };
-	const int x = 1, y = 1;
-	shooter.setTexture("player", shooterTexture, shooterTexture[0].size(), shooterTexture.size(), "blue", x, y);
+	shooter.setTexture({ {'-', '-', '\\'},
+						 {' ', ' ', '>'},
+						 {'-', '-', '/'} }, 5, height / 2, "blue");
 
+	Background background;
+	background.setTexture(width, height);
+
+	std::vector<Sprite> bullets;
 	std::vector<std::vector<char>> bulletTexture = { {'.'} };
 
-	Sprite enemy1;
-	std::vector<std::vector<char>> enemy1Texture = { {'<', '-', '-'} };
-	enemy1.setTexture("enemy1", enemy1Texture, enemy1Texture[0].size(), enemy1Texture.size(), "yellow", 40, 3);
-
-	clearScreen();
 	while (true) {
-		renderer.drawBorder(width, height, "magenta");
+		renderer.clearBuffer();
 
-		// Game Code Starts
-		renderer.clearSprite(shooter);
-		renderer.clearSprite(enemy1);
+		// Update background
+		setBGTexture(background, width, height);
+		renderer.drawBackground(background);
 
+		// Handle shooter movement
 		input.simpleMovementLogic(shooter, height, width);
 
+		// Handle bullet creation
 		static auto lastBulletTime = std::chrono::high_resolution_clock::now();
 		auto now = std::chrono::high_resolution_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastBulletTime).count();
 
 		if (input.isKeyPressed(VK_SPACE, 0x8000) && elapsed > 200) { // 200 ms cooldown
 			lastBulletTime = now;
-			bulletCount++;
-			Bullet bullet;
-			bullet.setTexture("bullet" + std::to_string(bulletCount), bulletTexture, bulletTexture[0].size(), bulletTexture.size(), "red", shooter.xpos + 3, shooter.ypos + 1);
+			Sprite bullet;
+			bullet.setTexture(bulletTexture, shooter.xpos + shooter.width, shooter.ypos + 1);
 			bullets.push_back(bullet);
 		}
 
-		handleBullets(bullets, enemy1, renderer, collision, width);
+		// Update bullets
+		for (auto it = bullets.begin(); it != bullets.end();) {
+			it->xpos++;
+			if (it->xpos >= width) {
+				it = bullets.erase(it);
+			}
+			else {
+				renderer.drawSprite(*it);
+				++it;
+			}
+		}
 
-		renderer.printSprite(shooter);
-		renderer.printSprite(enemy1);
+		// Draw shooter
+		renderer.drawSprite(shooter);
 
-		// Game Code Ends
+		// Render to screen
+		renderer.drawBuffer();
 
+		// Regulate FPS
 		fps.regulate();
 	}
+
 	return 0;
 }
