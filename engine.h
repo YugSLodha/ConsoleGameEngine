@@ -27,7 +27,7 @@
 // 13	Light Purple
 // 14	Light Yellow
 // 15	Bright White
-                                 
+
 // Utility Functions
 int randomNumber(int start, int end) {
 	std::random_device dev;

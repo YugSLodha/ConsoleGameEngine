@@ -1,6 +1,8 @@
 #include "engine.h"
 #include <vector>
 
+// TODO ADD DELTATIME
+
 // Function to update the background texture with stars
 void setBGTexture(Background& background, int width, int height, double density = 0.1) {
 	// Shift columns leftward
