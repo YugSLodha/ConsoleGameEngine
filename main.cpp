@@ -1,39 +1,54 @@
 #include "engine.h"
 #include <vector>
 
-void setBGTexture(Background& background, int width, int height) {
+// Function to update the background texture with stars
+void setBGTexture(Background& background, int width, int height, double density = 0.001) {
 	// Shift columns leftward
 	for (int x = 0; x < width - 1; ++x) {
 		for (int y = 0; y < height; ++y) {
 			background.texture[y][x] = background.texture[y][x + 1];
+			background.colorTexture[y][x] = background.colorTexture[y][x + 1];
 		}
 	}
 
-	// Generate a new rightmost column
+	// Generate a new rightmost column with controllable density
 	for (int y = 0; y < height; ++y) {
-		background.texture[y][width - 1] = (randomNumber(0, 10) < 2) ? '*' : ' ';
+		if (randomNumber(0, 100) < (density * 100)) {
+			int color = randomNumber(0, 15);
+			background.texture[y][width - 1] = '*';
+			background.colorTexture[y][width - 1] = color; // Yellow stars
+		}
+		else {
+			background.texture[y][width - 1] = ' ';
+			background.colorTexture[y][width - 1] = 7; // Default white background
+		}
 	}
 }
 
 int main() {
-	const int FPS = 30;
-	const int width = 50;
+	const int FPS = 60;
+	const int width = 60;
 	const int height = 20;
 
 	Renderer renderer(width, height);
 	Input input;
 	FpsManager fps(FPS);
 
+	// Shooter sprite
 	Sprite shooter;
 	shooter.setTexture({ {'-', '-', '\\'},
 						 {' ', ' ', '>'},
-						 {'-', '-', '/'} }, 5, height / 2, "blue");
+						 {'-', '-', '/'} }, 5, height / 2, 9); // Light blue shooter
 
+	// Background
 	Background background;
-	background.setTexture(width, height);
+	background.setTexture(width, height, 7); // Default white background
 
+	// Bullets
 	std::vector<Sprite> bullets;
 	std::vector<std::vector<char>> bulletTexture = { {'.'} };
+
+	clearScreen();
 
 	while (true) {
 		renderer.clearBuffer();
@@ -53,7 +68,7 @@ int main() {
 		if (input.isKeyPressed(VK_SPACE, 0x8000) && elapsed > 200) { // 200 ms cooldown
 			lastBulletTime = now;
 			Sprite bullet;
-			bullet.setTexture(bulletTexture, shooter.xpos + shooter.width, shooter.ypos + 1);
+			bullet.setTexture(bulletTexture, shooter.xpos + shooter.width, shooter.ypos + 1, 12); // Red bullets
 			bullets.push_back(bullet);
 		}
 

@@ -10,6 +10,26 @@
 #include <thread>
 #include <conio.h>
 
+// COLOR CHART
+// 0	Black
+// 1	Blue
+// 2	Green
+// 3	Aqua (Cyan)
+// 4	Red
+// 5	Purple
+// 6	Yellow
+// 7	White
+// 8	Gray
+// 9	Light Blue
+// 10	Light Green
+// 11	Light Aqua
+// 12	Light Red
+// 13	Light Purple
+// 14	Light Yellow
+// 15	Bright White
+
+
+// Utility Functions
 int randomNumber(int start, int end) {
 	std::random_device dev;
 	std::mt19937 rng(dev());
@@ -17,13 +37,18 @@ int randomNumber(int start, int end) {
 	return dist(rng);
 }
 
+void clearScreen() {
+	system("cls");
+}
+
+// Sprite Class
 class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
 	int width, height, xpos, ypos;
-	std::string color;
+	int color; // Single color for the entire sprite
 
-	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, const std::string& color = "original") {
+	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7) {
 		this->texture = texture;
 		this->width = texture[0].size();
 		this->height = texture.size();
@@ -33,32 +58,38 @@ public:
 	}
 };
 
+// Background Class
 class Background {
 public:
 	std::vector<std::vector<char>> texture;
+	std::vector<std::vector<int>> colorTexture; // Color for each cell
 	int width, height;
 
-	void setTexture(int width, int height) {
+	void setTexture(int width, int height, int color = 7) {
 		this->width = width;
 		this->height = height;
 		texture.resize(height, std::vector<char>(width, ' '));
+		colorTexture.resize(height, std::vector<int>(width, color));
 	}
 };
 
+// Renderer Class
 class Renderer {
 	HANDLE consoleHandle;
-	std::vector<std::vector<char>> buffer;
+	std::vector<std::vector<std::pair<char, int>>> buffer; // Pair of character and color
 
 public:
 	Renderer(int width, int height) {
 		consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 
+		// Hide cursor
 		CONSOLE_CURSOR_INFO cursorInfo;
 		GetConsoleCursorInfo(consoleHandle, &cursorInfo);
 		cursorInfo.bVisible = false;
 		SetConsoleCursorInfo(consoleHandle, &cursorInfo);
 
-		buffer.resize(height, std::vector<char>(width, ' '));
+		// Initialize buffer
+		buffer.resize(height, std::vector<std::pair<char, int>>(width, { ' ', 7 }));
 	}
 
 	void setCursorPosition(int x, int y) {
@@ -69,29 +100,31 @@ public:
 	void drawBuffer() {
 		setCursorPosition(0, 0);
 		for (const auto& row : buffer) {
-			for (const auto& ch : row) {
-				std::cout << ch;
+			for (const auto& cell : row) {
+				SetConsoleTextAttribute(consoleHandle, cell.second); // Set color
+				std::cout << cell.first;
 			}
 			std::cout << '\n';
 		}
+		SetConsoleTextAttribute(consoleHandle, 7); // Reset to default color
 	}
 
 	void clearBuffer() {
 		for (auto& row : buffer) {
-			std::fill(row.begin(), row.end(), ' ');
+			std::fill(row.begin(), row.end(), std::make_pair(' ', 7));
 		}
 	}
 
-	void drawChar(int x, int y, char ch) {
+	void drawChar(int x, int y, char ch, int color = 7) {
 		if (x >= 0 && x < buffer[0].size() && y >= 0 && y < buffer.size()) {
-			buffer[y][x] = ch;
+			buffer[y][x] = { ch, color };
 		}
 	}
 
 	void drawSprite(const Sprite& sprite) {
 		for (int y = 0; y < sprite.height; ++y) {
 			for (int x = 0; x < sprite.width; ++x) {
-				drawChar(sprite.xpos + x, sprite.ypos + y, sprite.texture[y][x]);
+				drawChar(sprite.xpos + x, sprite.ypos + y, sprite.texture[y][x], sprite.color);
 			}
 		}
 	}
@@ -99,12 +132,13 @@ public:
 	void drawBackground(const Background& background) {
 		for (int y = 0; y < background.height; ++y) {
 			for (int x = 0; x < background.width; ++x) {
-				drawChar(x, y, background.texture[y][x]);
+				drawChar(x, y, background.texture[y][x], background.colorTexture[y][x]);
 			}
 		}
 	}
 };
 
+// Input Class
 class Input {
 public:
 	char getKey() {
@@ -128,6 +162,7 @@ public:
 	}
 };
 
+// FpsManager Class
 class FpsManager {
 	int targetFps;
 	std::chrono::time_point<std::chrono::steady_clock> lastFrameTime;
