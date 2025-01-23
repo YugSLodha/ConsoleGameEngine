@@ -2,7 +2,7 @@
 #include <vector>
 
 // Function to update the background texture with stars
-void setBGTexture(Background& background, int width, int height, double density = 0.001) {
+void setBGTexture(Background& background, int width, int height, double density = 0.1) {
 	// Shift columns leftward
 	for (int x = 0; x < width - 1; ++x) {
 		for (int y = 0; y < height; ++y) {
@@ -14,9 +14,9 @@ void setBGTexture(Background& background, int width, int height, double density 
 	// Generate a new rightmost column with controllable density
 	for (int y = 0; y < height; ++y) {
 		if (randomNumber(0, 100) < (density * 100)) {
-			int color = randomNumber(0, 15);
+			int color = randomNumber(9, 15);
 			background.texture[y][width - 1] = '*';
-			background.colorTexture[y][width - 1] = color; // Yellow stars
+			background.colorTexture[y][width - 1] = color;
 		}
 		else {
 			background.texture[y][width - 1] = ' ';
@@ -27,8 +27,8 @@ void setBGTexture(Background& background, int width, int height, double density 
 
 int main() {
 	const int FPS = 60;
-	const int width = 60;
-	const int height = 20;
+	const int width = 131;
+	const int height = 30;
 
 	Renderer renderer(width, height);
 	Input input;
