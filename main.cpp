@@ -1,8 +1,6 @@
 #include "engine.h"
 #include <vector>
 
-// TODO ADD DELTATIME
-
 // Function to update the background texture with stars
 void setBGTexture(Background& background, int width, int height, double density = 0.1) {
 	// Shift columns leftward
@@ -31,6 +29,9 @@ int main() {
 	const int FPS = 60;
 	const int width = 131;
 	const int height = 30;
+
+	// TODO OPTIMIZE
+	// TODO ADD DELTA TIME
 
 	Renderer renderer(width, height);
 	Input input;
