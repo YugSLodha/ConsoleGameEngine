@@ -2,14 +2,16 @@
 
 int main() {
 	const int FPS = 60;
-	const int width = 30;
-	const int height = 20;
+	const int width = 20;
+	const int height = 8;
 
 	Renderer renderer(width, height);
 	FpsManager fps(FPS);
-	Input input;
+	Input input :
 
-	renderer.resizeConsole(width, height);
+	Sprite testSprite;
+	testSprite.setTexture({ {'H', 'I'} }, 1, 1, 4, 1);
+
 	clearScreen();
 	while (true) {
 		renderer.clearBuffer();

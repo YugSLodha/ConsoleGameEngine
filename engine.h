@@ -44,16 +44,18 @@ void clearScreen() {
 class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
-	int width, height, xpos, ypos;
+	int width, height, xpos, ypos, velocityX, velocityY;
 	int color;
 
-	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7) {
+	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7, int velX = 0, int velY = 0) {
 		this->texture = texture;
 		this->width = texture[0].size();
 		this->height = texture.size();
 		this->xpos = xpos;
 		this->ypos = ypos;
 		this->color = color;
+		this->velocityX = velX;
+		this->velocityY = velY;
 	}
 
 	void move(int dx, int dy) {
@@ -115,17 +117,6 @@ public:
 		COORD position = { static_cast<SHORT>(x), static_cast<SHORT>(y) };
 		SetConsoleCursorPosition(consoleHandle, position);
 	}
-
-	void resizeConsole(int width, int height) {
-		// Resize the console screen buffer
-		COORD bufferSize = { static_cast<SHORT>(width), static_cast<SHORT>(height) };
-		SetConsoleScreenBufferSize(consoleHandle, bufferSize);
-
-		// Adjust the console window size
-		SMALL_RECT windowSize = { 0, 0, static_cast<SHORT>(width - 1), static_cast<SHORT>(height - 1) };
-		SetConsoleWindowInfo(consoleHandle, TRUE, &windowSize);
-	}
-
 
 	void drawBuffer() {
 		setCursorPosition(0, 0);
@@ -196,23 +187,23 @@ public:
 	// Returns a list of keys that are currently pressed
 	char getKey() {
 		if (_kbhit()) {
-			char key = _getch()
-				return key;
+			char key = _getch();
+			return key;
 		}
+	}
 
-		// Checks if a specific key is pressed
-		bool isKeyPressed(char key, int code) {
-			return GetAsyncKeyState(key) & 0x8000;
-		}
+	// Checks if a specific key is pressed
+	bool isKeyPressed(char key, int code) {
+		return GetAsyncKeyState(key) & 0x8000;
+	}
 
-		// Simple movement logic for WASD keys
-		void simpleMovementLogic(Sprite & sprite, int screenHeight, int screenWidth, int border = 1) {
-			switch (getKey()) {
-			case 'w': if (sprite.ypos > border) sprite.ypos--; break;
-			case 'a': if (sprite.xpos > border) sprite.xpos--; break;
-			case 's': if (sprite.ypos + sprite.height < screenHeight - border) sprite.ypos++; break;
-			case 'd': if (sprite.xpos + sprite.width < screenWidth - border) sprite.xpos++; break;
-			}
+	// Simple movement logic for WASD keys
+	void simpleMovementLogic(Sprite& sprite, int screenHeight, int screenWidth, int border = 1) {
+		switch (getKey()) {
+		case 'w': if (sprite.ypos > border) sprite.ypos--; break;
+		case 'a': if (sprite.xpos > border) sprite.xpos--; break;
+		case 's': if (sprite.ypos + sprite.height < screenHeight - border) sprite.ypos++; break;
+		case 'd': if (sprite.xpos + sprite.width < screenWidth - border) sprite.xpos++; break;
 		}
 	}
 
