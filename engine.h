@@ -45,7 +45,7 @@ class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
 	int width, height, xpos, ypos;
-	int color; // Single color for the entire sprite
+	int color;
 
 	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7) {
 		this->texture = texture;
@@ -54,6 +54,31 @@ public:
 		this->xpos = xpos;
 		this->ypos = ypos;
 		this->color = color;
+	}
+
+	std::vector<std::vector<char>> getTexture() const {
+		return texture;
+	}
+
+	std::pair<int, int> getDimensions() const {
+		return { width, height };
+	}
+
+	void move(int dx, int dy) {
+		xpos += dx;
+		ypos += dy;
+	}
+
+	std::pair<int, int> getPosition() const {
+		return { xpos, ypos };
+	}
+
+	int getColor() const {
+		return color;
+	}
+
+	char getPixex(int x, int y) const {
+		return texture[x][y];
 	}
 };
 
@@ -174,24 +199,40 @@ public:
 // Input Class
 class Input {
 public:
-	char getKey() {
+	// Returns a list of keys that are currently pressed
+	std::vector<char> getPressedKeys() {
+		std::vector<char> keys;
 		if (_kbhit()) {
-			return _getch();
+			char key = _getch();
+			keys.push_back(key);
 		}
-		return '\0';
+		return keys;
 	}
 
+	// Checks if a specific key is pressed
 	bool isKeyPressed(char key, int code) {
-		return GetAsyncKeyState(key) & code;
+		return GetAsyncKeyState(key) & 0x8000;
 	}
 
+	// Simple movement logic for WASD keys
 	void simpleMovementLogic(Sprite& sprite, int screenHeight, int screenWidth, int border = 1) {
-		switch (getKey()) {
-		case 'w': if (sprite.ypos > border) sprite.ypos--; break;
-		case 'a': if (sprite.xpos > border) sprite.xpos--; break;
-		case 's': if (sprite.ypos + sprite.height < screenHeight - border) sprite.ypos++; break;
-		case 'd': if (sprite.xpos + sprite.width < screenWidth - border) sprite.xpos++; break;
+		// Check for multiple keys being pressed
+		std::vector<char> keys = getPressedKeys();
+
+		// Check for 'w', 'a', 's', 'd' keys for movement
+		for (char key : keys) {
+			switch (key) {
+			case 'w': if (sprite.ypos > border) sprite.ypos--; break;
+			case 'a': if (sprite.xpos > border) sprite.xpos--; break;
+			case 's': if (sprite.ypos + sprite.height < screenHeight - border) sprite.ypos++; break;
+			case 'd': if (sprite.xpos + sprite.width < screenWidth - border) sprite.xpos++; break;
+			}
 		}
+	}
+
+	// Additional function to check if both 'W' and 'D' are pressed at the same time
+	bool areKeysPressed(char key1, char key2) {
+		return isKeyPressed(key1, 0x8000) && isKeyPressed(key2, 0x8000);
 	}
 };
 
