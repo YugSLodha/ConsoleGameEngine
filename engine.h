@@ -56,29 +56,9 @@ public:
 		this->color = color;
 	}
 
-	std::vector<std::vector<char>> getTexture() const {
-		return texture;
-	}
-
-	std::pair<int, int> getDimensions() const {
-		return { width, height };
-	}
-
 	void move(int dx, int dy) {
 		xpos += dx;
 		ypos += dy;
-	}
-
-	std::pair<int, int> getPosition() const {
-		return { xpos, ypos };
-	}
-
-	int getColor() const {
-		return color;
-	}
-
-	char getPixex(int x, int y) const {
-		return texture[x][y];
 	}
 };
 
@@ -107,7 +87,7 @@ public:
 		if (x >= 0 && x < width && y >= 0 && y < height) {
 			return texture[y][x];
 		}
-		return { ' ', 7 };  // Default character and color if out of bounds
+		return { ' ', 7 };
 	}
 };
 
@@ -194,34 +174,40 @@ public:
 			}
 		}
 	}
+
+	void drawBorder(int width = 80, int height = 25, char borderChar = '#', int borderColor = 7) {
+		// Draw top and bottom borders
+		for (int x = 0; x < width; ++x) {
+			drawChar(x, 0, borderChar, borderColor); // Top border
+			drawChar(x, height - 1, borderChar, borderColor); // Bottom border
+		}
+
+		// Draw left and right borders
+		for (int y = 0; y < height; ++y) {
+			drawChar(0, y, borderChar, borderColor); // Left border
+			drawChar(width - 1, y, borderChar, borderColor); // Right border
+		}
+	}
 };
 
 // Input Class
 class Input {
 public:
 	// Returns a list of keys that are currently pressed
-	std::vector<char> getPressedKeys() {
-		std::vector<char> keys;
+	char getKey() {
 		if (_kbhit()) {
-			char key = _getch();
-			keys.push_back(key);
+			char key = _getch()
+				return key;
 		}
-		return keys;
-	}
 
-	// Checks if a specific key is pressed
-	bool isKeyPressed(char key, int code) {
-		return GetAsyncKeyState(key) & 0x8000;
-	}
+		// Checks if a specific key is pressed
+		bool isKeyPressed(char key, int code) {
+			return GetAsyncKeyState(key) & 0x8000;
+		}
 
-	// Simple movement logic for WASD keys
-	void simpleMovementLogic(Sprite& sprite, int screenHeight, int screenWidth, int border = 1) {
-		// Check for multiple keys being pressed
-		std::vector<char> keys = getPressedKeys();
-
-		// Check for 'w', 'a', 's', 'd' keys for movement
-		for (char key : keys) {
-			switch (key) {
+		// Simple movement logic for WASD keys
+		void simpleMovementLogic(Sprite & sprite, int screenHeight, int screenWidth, int border = 1) {
+			switch (getKey()) {
 			case 'w': if (sprite.ypos > border) sprite.ypos--; break;
 			case 'a': if (sprite.xpos > border) sprite.xpos--; break;
 			case 's': if (sprite.ypos + sprite.height < screenHeight - border) sprite.ypos++; break;
