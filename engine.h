@@ -60,17 +60,32 @@ public:
 // Background Class
 class Background {
 public:
-	std::vector<std::vector<char>> texture;
-	std::vector<std::vector<int>> colorTexture; // Color for each cell
+	std::vector<std::vector<std::pair<char, int>>> texture; // Each cell holds a character and its color
 	int width, height;
 
-	void setTexture(int width, int height, int color = 7) {
+	// Constructor to initialize the background with dimensions and optional default character and color
+	void setTexture(int width, int height, char defaultChar = ' ', int defaultColor = 7) {
 		this->width = width;
 		this->height = height;
-		texture.resize(height, std::vector<char>(width, ' '));
-		colorTexture.resize(height, std::vector<int>(width, color));
+		texture.resize(height, std::vector<std::pair<char, int>>(width, { defaultChar, defaultColor }));
+	}
+
+	// Set a specific character and color at a given position
+	void setPixel(int x, int y, char ch, int color) {
+		if (x >= 0 && x < width && y >= 0 && y < height) {
+			texture[y][x] = { ch, color };
+		}
+	}
+
+	// Get the character and color at a specific position
+	std::pair<char, int> getPixel(int x, int y) const {
+		if (x >= 0 && x < width && y >= 0 && y < height) {
+			return texture[y][x];
+		}
+		return { ' ', 7 };  // Default character and color if out of bounds
 	}
 };
+
 
 // Renderer Class
 class Renderer {
@@ -142,7 +157,15 @@ public:
 	void drawBackground(const Background& background) {
 		for (int y = 0; y < background.height; ++y) {
 			for (int x = 0; x < background.width; ++x) {
-				drawChar(x, y, background.texture[y][x], background.colorTexture[y][x]);
+				// Retrieve the character and color from the background texture
+				auto pixel = background.getPixel(x, y);
+				char ch = pixel.first;
+				int color = pixel.second;
+
+				// Only update if the current pixel differs from the buffer
+				if (buffer[y][x].first != ch || buffer[y][x].second != color) {
+					drawChar(x, y, ch, color);  // Update the character and color at position (x, y)
+				}
 			}
 		}
 	}
