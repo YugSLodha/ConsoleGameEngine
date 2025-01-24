@@ -96,6 +96,17 @@ public:
 		SetConsoleCursorPosition(consoleHandle, position);
 	}
 
+	void resizeConsole(int width, int height) {
+		// Resize the console screen buffer
+		COORD bufferSize = { static_cast<SHORT>(width), static_cast<SHORT>(height) };
+		SetConsoleScreenBufferSize(consoleHandle, bufferSize);
+
+		// Adjust the console window size
+		SMALL_RECT windowSize = { 0, 0, static_cast<SHORT>(width - 1), static_cast<SHORT>(height - 1) };
+		SetConsoleWindowInfo(consoleHandle, TRUE, &windowSize);
+	}
+
+
 	void drawBuffer() {
 		setCursorPosition(0, 0);
 		for (const auto& row : buffer) {
@@ -165,23 +176,32 @@ public:
 class FpsManager {
 	int targetFps;
 	std::chrono::time_point<std::chrono::steady_clock> lastFrameTime;
+	float deltaTime;  // Time elapsed since the last frame
 
 public:
-	FpsManager(int fps) : targetFps(fps) {
+	FpsManager(int fps) : targetFps(fps), deltaTime(0.0f) {
 		lastFrameTime = std::chrono::steady_clock::now();
 	}
 
-	void regulate() {
+	float regulate() {
 		using namespace std::chrono;
-		auto targetFrameDuration = duration<double>(1.0 / targetFps);
-		auto currentTime = steady_clock::now();
-		auto elapsedTime = duration_cast<duration<double>>(currentTime - lastFrameTime);
 
+		// Calculate time elapsed since the last frame
+		auto currentTime = steady_clock::now();
+		auto elapsedTime = duration_cast<duration<float>>(currentTime - lastFrameTime);
+		deltaTime = elapsedTime.count();  // Store delta time in seconds
+
+		// Calculate the target frame duration
+		auto targetFrameDuration = duration<float>(1.0f / targetFps);
+
+		// Sleep if the frame duration is less than the target frame duration
 		if (elapsedTime < targetFrameDuration) {
 			std::this_thread::sleep_for(targetFrameDuration - elapsedTime);
 		}
 
+		// Update the last frame time
 		lastFrameTime = steady_clock::now();
+		return deltaTime;
 	}
 };
 
