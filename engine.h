@@ -47,15 +47,15 @@ public:
 	int width, height, xpos, ypos, velocityX, velocityY;
 	int color;
 
-	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7, int velX = 0, int velY = 0) {
+	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7, int velocityX = 0, int velocityY = 0) {
 		this->texture = texture;
 		this->width = texture[0].size();
 		this->height = texture.size();
 		this->xpos = xpos;
 		this->ypos = ypos;
 		this->color = color;
-		this->velocityX = velX;
-		this->velocityY = velY;
+		this->velocityX = velocityX;
+		this->velocityY = velocityY;
 	}
 
 	void move(int dx, int dy) {
@@ -246,4 +246,14 @@ public:
 	}
 };
 
+
+class PhysicsEngine {
+public:
+	float gravity = 9.8f;
+
+	void applyGravity(Sprite& sprite, float deltatime) {
+		sprite.velocityY += gravity * deltatime;
+		sprite.ypos += sprite.velocityY * deltatime;
+	}
+};
 #endif
