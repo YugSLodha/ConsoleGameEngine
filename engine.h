@@ -1,3 +1,4 @@
+
 #ifndef ENGINE_H
 #define ENGINE_H
 
@@ -30,37 +31,83 @@
 
 // Utility Functions
 int randomNumber(int start, int end) {
-	std::random_device dev;
-	std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist(start, end);
+	static std::random_device dev;
+	static std::mt19937 rng(dev());
+	static std::uniform_int_distribution<std::mt19937::result_type> dist(start, end);
 	return dist(rng);
 }
 
 void clearScreen() {
-	system("cls");
+	std::cout << "\033[2J\033[1;1H";
 }
 
-// Sprite Class
 class Sprite {
 public:
 	std::vector<std::vector<char>> texture;
-	int width, height, xpos, ypos, velocityX, velocityY;
+	int width, height, xpos, ypos;
 	int color;
 
-	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7, int velocityX = 0, int velocityY = 0) {
+	void setTexture(const std::vector<std::vector<char>>& texture, int xpos = 0, int ypos = 0, int color = 7) {
 		this->texture = texture;
 		this->width = texture[0].size();
 		this->height = texture.size();
 		this->xpos = xpos;
 		this->ypos = ypos;
 		this->color = color;
-		this->velocityX = velocityX;
-		this->velocityY = velocityY;
 	}
 
 	void move(int dx, int dy) {
 		xpos += dx;
 		ypos += dy;
+	}
+};
+
+class PhysicsObject {
+public:
+	Sprite sprite;
+	float velocityX, velocityY;
+	float mass;
+
+	// Constructor
+	PhysicsObject(Sprite gSprite, float mass, float velocityX = 0.0f, float velocityY = 0.0f)
+		: sprite(gSprite), mass(mass), velocityX(velocityX), velocityY(velocityY) {
+	}
+
+	// Update position based on velocity
+	void updatePosition(float deltaTime) {
+		sprite.xpos += velocityX * deltaTime;
+		sprite.ypos += velocityY * deltaTime;
+	}
+};
+
+// PhysicsEngine Class
+class PhysicsEngine {
+public:
+	float gravity = 9.8f;
+	float dampingFactor = 0.98f
+
+		void applyGravity(PhysicsObject & object, float deltaTime) {
+		if (object.mass > 0) {
+			object.velocityY += gravity * deltaTime;
+			object.updatePosition(deltaTime);
+		}
+	}
+
+	void applyForce(PhysicsObject& object, float deltaTime, float forceX, float forceY) {
+		if (object.mass > 0) {
+			object.velocityX += (forceX / object.mass) * deltaTime;
+			object.velocityY += (forceY / object.mass) * deltaTime;
+		}
+	}
+
+	void applyDamping(PhysicsObject& object) {
+		object.velocityX *= dampingFactor;
+		object.velocityY *= dampingFactor;
+	}
+
+	void stopForces(PhysicsObject& physicsObject) {
+		physicsObject.velocityY = 0;  // Stop falling
+		physicsObject.velocityX = 0;  // Stop moving horizontally
 	}
 };
 
@@ -184,34 +231,19 @@ public:
 // Input Class
 class Input {
 public:
-	// Returns a list of keys that are currently pressed
 	char getKey() {
 		if (_kbhit()) {
-			char key = _getch();
-			return key;
+			return _getch();
 		}
+		return '\0';
 	}
 
-	// Checks if a specific key is pressed
-	bool isKeyPressed(char key, int code) {
-		return GetAsyncKeyState(key) & 0x8000;
-	}
-
-	// Simple movement logic for WASD keys
-	void simpleMovementLogic(Sprite& sprite, int screenHeight, int screenWidth, int border = 1) {
-		switch (getKey()) {
-		case 'w': if (sprite.ypos > border) sprite.ypos--; break;
-		case 'a': if (sprite.xpos > border) sprite.xpos--; break;
-		case 's': if (sprite.ypos + sprite.height < screenHeight - border) sprite.ypos++; break;
-		case 'd': if (sprite.xpos + sprite.width < screenWidth - border) sprite.xpos++; break;
-		}
-	}
-
-	// Additional function to check if both 'W' and 'D' are pressed at the same time
-	bool areKeysPressed(char key1, char key2) {
-		return isKeyPressed(key1, 0x8000) && isKeyPressed(key2, 0x8000);
+	bool isKeyPressed(char key) {
+		return GetAsyncKeyState(static_cast<int>(key)) & 0x8000;
 	}
 };
+
+
 
 // FpsManager Class
 class FpsManager {
@@ -247,13 +279,4 @@ public:
 };
 
 
-class PhysicsEngine {
-public:
-	float gravity = 9.8f;
-
-	void applyGravity(Sprite& sprite, float deltatime) {
-		sprite.velocityY += gravity * deltatime;
-		sprite.ypos += sprite.velocityY * deltatime;
-	}
-};
 #endif

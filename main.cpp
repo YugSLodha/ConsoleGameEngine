@@ -11,22 +11,30 @@ int main() {
 	Input input;
 	PhysicsEngine physicsEngine;
 
+	// Create sprite and physics object
+	const std::vector<std::vector<char>> sTexture = { {'%', '%'}, {'%', '%'} };
 	Sprite testSprite;
-	const std::vector<std::vector<char>> sTexure = { {'%', '%'}, {'%', '%'} };
-	testSprite.setTexture(sTexure, 1, 1, 1, 0, 10);
+	testSprite.setTexture(sTexture, 1, 1, 1);
+	PhysicsObject physicsObject(testSprite, 2.0f, 0.0f, 0.0f); // Mass = 2
 
 	clearScreen();
 	while (true) {
 		renderer.clearBuffer();
-		float deltatime = fps.regulate();
+		float deltaTime = fps.regulate();
+
 		renderer.drawBorder(width, height, '#', 15);
-		// CODE START
-		renderer.drawSprite(testSprite);
-		if (testSprite.ypos < height - 3) {
-			physicsEngine.applyGravity(testSprite, deltatime);
+
+		// Apply physics
+		if (physicsObject.sprite.ypos + physicsObject.sprite.height >= height - 1) {
+			physicsEngine.stopForces(physicsObject);
 		}
-		else testSprite.velocityY = 10;
-		// CODE END
+		else {
+			physicsEngine.applyGravity(physicsObject, deltaTime);
+		}
+		physicsEngine.applyDamping(physicsObject);
+
+		// Render sprite
+		renderer.drawSprite(physicsObject.sprite);
 		renderer.drawBuffer();
 	}
 	return 0;
