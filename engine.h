@@ -33,7 +33,7 @@
 int randomNumber(int start, int end) {
 	static std::random_device dev;
 	static std::mt19937 rng(dev());
-	static std::uniform_int_distribution<std::mt19937::result_type> dist(start, end);
+	std::uniform_int_distribution<std::mt19937::result_type> dist(start, end);
 	return dist(rng);
 }
 
@@ -84,9 +84,9 @@ public:
 class PhysicsEngine {
 public:
 	float gravity = 9.8f;
-	float dampingFactor = 0.98f
+	float dampingFactor = 0.98f;
 
-		void applyGravity(PhysicsObject & object, float deltaTime) {
+	void applyGravity(PhysicsObject& object, float deltaTime) {
 		if (object.mass > 0) {
 			object.velocityY += gravity * deltaTime;
 			object.updatePosition(deltaTime);
@@ -108,6 +108,29 @@ public:
 	void stopForces(PhysicsObject& physicsObject) {
 		physicsObject.velocityY = 0;  // Stop falling
 		physicsObject.velocityX = 0;  // Stop moving horizontally
+	}
+};
+
+class UI {
+public:
+	struct UIElement {
+		std::string text;
+		int xpos, ypos;
+		int color;
+
+		UIElement(std::string text, int x, int y, int color = 7)
+			: text(text), xpos(x), ypos(y), color(color) {
+		}
+	};
+
+	std::vector<UIElement> elements;
+
+	void addElement(const std::string& text, int x, int y, int color = 7) {
+		elements.push_back(UIElement(text, x, y, color));
+	}
+
+	void clear() {
+		elements.clear();
 	}
 };
 
@@ -226,6 +249,14 @@ public:
 			drawChar(width - 1, y, borderChar, borderColor); // Right border
 		}
 	}
+
+	void drawUI(const UI& ui) {
+		for (const auto& element : ui.elements) {
+			for (size_t i = 0; i < element.text.size(); ++i) {
+				drawChar(element.xpos + i, element.ypos, element.text[i], element.color);
+			}
+		}
+	}
 };
 
 // Input Class
@@ -259,23 +290,19 @@ public:
 	float regulate() {
 		using namespace std::chrono;
 
-		// Calculate time elapsed since the last frame
 		auto currentTime = steady_clock::now();
 		auto elapsedTime = duration_cast<duration<float>>(currentTime - lastFrameTime);
-		deltaTime = elapsedTime.count();  // Store delta time in seconds
+		deltaTime = elapsedTime.count();
 
-		// Calculate the target frame duration
 		auto targetFrameDuration = duration<float>(1.0f / targetFps);
-
-		// Sleep if the frame duration is less than the target frame duration
 		if (elapsedTime < targetFrameDuration) {
 			std::this_thread::sleep_for(targetFrameDuration - elapsedTime);
 		}
 
-		// Update the last frame time
 		lastFrameTime = steady_clock::now();
 		return deltaTime;
 	}
+
 };
 
 
