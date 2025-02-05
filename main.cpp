@@ -10,12 +10,11 @@ int main() {
 	FpsManager fps(FPS);
 	Input input;
 	PhysicsEngine physicsEngine;
+	UI ui;
 
-	// Create sprite and physics object
-	const std::vector<std::vector<char>> sTexture = { {'%', '%'}, {'%', '%'} };
-	Sprite testSprite;
-	testSprite.setTexture(sTexture, 1, 1, 1);
-	PhysicsObject physicsObject(testSprite, 2.0f, 0.0f, 0.0f); // Mass = 2
+	const std::string playText = "Press <Enter> To Play";
+	const std::string settingsText = "Press <Shift> To Open Settings";
+	const std::string exitText = "Press <Escape> To Exit";
 
 	clearScreen();
 	while (true) {
@@ -24,17 +23,12 @@ int main() {
 
 		renderer.drawBorder(width, height, '#', 15);
 
-		// Apply physics
-		if (physicsObject.sprite.ypos + physicsObject.sprite.height >= height - 1) {
-			physicsEngine.stopForces(physicsObject);
-		}
-		else {
-			physicsEngine.applyGravity(physicsObject, deltaTime);
-		}
-		physicsEngine.applyDamping(physicsObject);
+		ui.addElement(playText, width / 2 - playText.length() / 2, height / 2 + 2, 1);
+		ui.addElement(settingsText, width / 2 - settingsText.length() / 2, height / 2 + 3, 1);
+		ui.addElement(exitText, width / 2 - exitText.length() / 2, height / 2 + 4, 1);
 
-		// Render sprite
-		renderer.drawSprite(physicsObject.sprite);
+		renderer.drawUI(ui);
+
 		renderer.drawBuffer();
 	}
 	return 0;
