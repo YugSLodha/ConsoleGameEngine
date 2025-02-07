@@ -111,29 +111,6 @@ public:
 	}
 };
 
-class UI {
-public:
-	struct UIElement {
-		std::string text;
-		int xpos, ypos;
-		int color;
-
-		UIElement(std::string text, int x, int y, int color = 7)
-			: text(text), xpos(x), ypos(y), color(color) {
-		}
-	};
-
-	std::vector<UIElement> elements;
-
-	void addElement(const std::string& text, int x, int y, int color = 7) {
-		elements.push_back(UIElement(text, x, y, color));
-	}
-
-	void clear() {
-		elements.clear();
-	}
-};
-
 // Background Class
 class Background {
 public:
@@ -247,14 +224,6 @@ public:
 		for (int y = 0; y < height; ++y) {
 			drawChar(0, y, borderChar, borderColor); // Left border
 			drawChar(width - 1, y, borderChar, borderColor); // Right border
-		}
-	}
-
-	void drawUI(const UI& ui) {
-		for (const auto& element : ui.elements) {
-			for (size_t i = 0; i < element.text.size(); ++i) {
-				drawChar(element.xpos + i, element.ypos, element.text[i], element.color);
-			}
 		}
 	}
 };
