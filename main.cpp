@@ -1,28 +1,12 @@
 
-#include "bigfont.h"
 #include "engine.h"
 
 int main() {
-	const int height = 20;
-	const int width = 120;
-	const int FPS = 60;
-	float deltatime;
+	std::vector<std::string> H = getTitleFont('b');
 
-	FONT font;
-	Renderer renderer(width, height);
-	FpsManager fpsManager(FPS);
-
-	clearScreen();
-	while (true) {
-		deltatime = fpsManager.regulate();
-		renderer.clearBuffer();
-		renderer.drawBorder(width, height, '#', 15);
-
-		renderer.drawUI(Ui);
-
-		renderer.drawBuffer();
+	for (int i = 0; i < H.size(); i++) {
+        std::cout << H[i]<< std::endl;
 	}
-
-
+	
 	return 0;
 };

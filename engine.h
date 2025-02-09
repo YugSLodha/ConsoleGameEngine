@@ -10,6 +10,7 @@
 #include <chrono>
 #include <thread>
 #include <conio.h>
+#include "bigfont.h"
 
 // COLOR CHART
 // 0	Black
@@ -28,6 +29,39 @@
 // 13	Light Purple
 // 14	Light Yellow
 // 15	Bright White
+
+std::vector<std::string> getTitleFont(char letter) {
+	letter = (char)tolower(letter);
+	switch (letter) {
+	case 'a': return a;
+	case 'b': return b;
+	case 'c': return c;
+	case 'd': return d;
+	case 'e': return e;
+	case 'f': return f;
+	case 'g': return g;
+	case 'h': return h;
+	case 'i': return i;
+	case 'j': return j;
+	case 'k': return k;
+	case 'l': return l;
+	case 'm': return m;
+	case 'n': return n;
+	case 'o': return o;
+	case 'p': return p;
+	case 'q': return q;
+	case 'r': return r;
+	case 's': return s;
+	case 't': return t;
+	case 'u': return u;
+	case 'v': return v;
+	case 'w': return w;
+	case 'x': return x;
+	case 'y': return y;
+	case 'z': return z;
+	default: return std::vector<std::string>();
+	}
+}
 
 // Utility Functions
 int randomNumber(int start, int end) {

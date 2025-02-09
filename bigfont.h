@@ -1,13 +1,33 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> a = {};
+std::vector<std::string> a = { " _____ ",
+							   "|  _  |",
+							   "| |_| |",
+							   "|  _  |",
+							   "| | | |",
+							   "|_| |_|" };
 
-std::vector<std::string> b = {};
+std::vector<std::string> b = { " _____ ",
+							   "|     \\",
+							   "|     |",
+							   "|------",
+							   "|     |",
+							   "|_____/" };
 
-std::vector<std::string> c = {};
+std::vector<std::string> c = { " _____ ",
+							   "|  ___|",
+							   "| |    ",
+							   "| |    ",
+							   "| |___ ",
+							   "|_____|" };
 
-std::vector<std::string> d = {};
+std::vector<std::string> d = { " _____ ",
+								"|  _ _|",
+								"| | | |",
+								"| | | |",
+								"| |_|_| ",
+								"|_____|" };
 
 std::vector<std::string> e = { " _____ ",
 							   "|   __|",
@@ -16,16 +36,21 @@ std::vector<std::string> e = { " _____ ",
 							   "|  |__ ",
 							   "|_____|" };
 
-std::vector<std::string> f = {};
+std::vector<std::string> f = { " _____ ",
+							   "|   __|",
+							   "|  |__ ",
+							   "|   __|",
+							   "|  |   ",
+							   "|__|   " };
 
 std::vector<std::string> g = {};
 
-std::vector<std::string> h = { "",
-							   "",
-							   "",
-							   "",
-							   "",
-							   "" };
+std::vector<std::string> h = { " _   _ ",
+							   "| | | |",
+							   "| |_| |" ,
+							   "|  _  |",
+							   "| | | |",
+							   "|_| |_|" };
 
 std::vector<std::string> i = { " _____ ",
 							   "|_____|",
@@ -38,13 +63,23 @@ std::vector<std::string> j = {};
 
 std::vector<std::string> k = {};
 
-std::vector<std::string> l = {};
+std::vector<std::string> l = { " _     ",
+							   "| |    ",
+							   "| |    ",
+							   "| |    ",
+							   "| |___ ",
+							   "|_____|" };
 
 std::vector<std::string> m = {};
 
 std::vector<std::string> n = {};
 
-std::vector<std::string> o = {};
+std::vector<std::string> o = { " _____ ",
+							   "|  _  |",
+							   "| | | |",
+							   "| | | |",
+							   "| |_| |",
+							   "|_____|" };
 
 std::vector<std::string> p = {};
 
