@@ -43,7 +43,13 @@ std::vector<std::string> f = { " _____ ",
 							   "|  |   ",
 							   "|__|   " };
 
-std::vector<std::string> g = {};
+std::vector<std::string> g = {
+	" _____ ",
+	"| ____|",
+	"| | __ ",
+	"| ||_ |",
+	"| |_| |",
+	"|_____|" };
 
 std::vector<std::string> h = { " _   _ ",
 							   "| | | |",
@@ -53,15 +59,27 @@ std::vector<std::string> h = { " _   _ ",
 							   "|_| |_|" };
 
 std::vector<std::string> i = { " _____ ",
-							   "|_____|",
+							   "|_   _|",
 							   "  | |  ",
 							   "  | |  ",
-							   " _|_|_ ",
+							   " _| |_ ",
 							   "|_____|" };
 
-std::vector<std::string> j = {};
+std::vector<std::string> j = {
+	"      _ ",
+	"     |_|",
+	"      _ ",
+	"     | |",
+	"    _| |",
+	"   |___|" };
 
-std::vector<std::string> k = {};
+std::vector<std::string> k = {
+	" _   _ ",
+	"| | / /",
+	"| |/ / ",
+	"|   |  ",
+	"| |\\ \\ ",
+	"|_| \\_\\" };
 
 std::vector<std::string> l = { " _     ",
 							   "| |    ",
@@ -70,9 +88,21 @@ std::vector<std::string> l = { " _     ",
 							   "| |___ ",
 							   "|_____|" };
 
-std::vector<std::string> m = {};
+std::vector<std::string> m = {
+	" _   _ ",
+	"| \\_/ |",
+	"|     |",
+	"| | | |",
+	"| | | |",
+	"|_| |_|" };
 
-std::vector<std::string> n = {};
+std::vector<std::string> n = {
+	" ___   ",
+	"|   \\  ",
+	"| |\\ \\ ",
+	"| | \\ |",
+	"| | | |",
+	"|_| |_|" };
 
 std::vector<std::string> o = { " _____ ",
 							   "|  _  |",
@@ -81,12 +111,23 @@ std::vector<std::string> o = { " _____ ",
 							   "| |_| |",
 							   "|_____|" };
 
-std::vector<std::string> p = {};
+std::vector<std::string> p = {
+	" _____ ",
+	"|  _  \\",
+	"| |_| |",
+	"|  ___/",
+	"| |    ",
+	"|_|    " };
 
-std::vector<std::string> q = {};
-
+std::vector<std::string> q = {
+	" _____ ",
+	"/  _  |",
+	"| |_| |",
+	"\\___  |",
+	"    | |",
+	"    |_|" };
 std::vector<std::string> r = { " _____ ",
-							   "|     \\",
+							   "| ___ \\",
 							   "|_____/",
 							   "| \\    ",
 							   "|   \\  ",
@@ -100,23 +141,59 @@ std::vector<std::string> s = { " _____ ",
 							   "|_____|" };
 
 std::vector<std::string> t = { " _____ ",
-							   "|_____|",
+							   "|_   _|",
 							   "  | |  ",
 							   "  | |  ",
 							   "  | |  ",
 							   "  |_|  " };
 
-std::vector<std::string> u = {};
+std::vector<std::string> u = {
+	" _   _ ",
+	"| | | |",
+	"| | | |",
+	"| | | |",
+	"| |_| |",
+	"\\_____/" };
 
-std::vector<std::string> v = {};
+std::vector<std::string> v = {
+	" _   _ ",
+	"| | | |",
+	"| | | |",
+	"\\ \\ / /",
+	" \\   / ",
+	"  \\_/ ", };
 
-std::vector<std::string> w = {};
+std::vector<std::string> w = {
+	" _   _ ",
+	"| | | |",
+	"| | | |",
+	"| |_| |",
+	"| | | |",
+	"|_/ \\_|" };
 
-std::vector<std::string> x = {};
+std::vector<std::string> x = {
+	" _   _ ",
+	"\\ \\ / /",
+	" \\   / ",
+	"  | | ",
+	" /   \\ ",
+	"/_/ \\_\\" };
 
-std::vector<std::string> y = {};
+std::vector<std::string> y = {
+	" _   _ ",
+	"\\ \\_/ /",
+	" \\   / ",
+	"  | |  ",
+	"  | |  ",
+	"  |_|  " };
 
-std::vector<std::string> z = {};
+std::vector<std::string> z = {
+	" _____ ",
+	"|__   |",
+	"  /  / ",
+	" /  /  ",
+	"/  /__ ",
+	"|_____|" };
 
 struct FONT {
 	std::vector<std::string>& A = a;
