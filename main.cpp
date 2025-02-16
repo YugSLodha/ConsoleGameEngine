@@ -2,15 +2,25 @@
 #include "engine.h"
 
 int main() {
-	char letters[26] = { 'h', 'e', 'l', 'l', 'o' };
-	std::vector<std::string> a = getTitleFont(letters[0]);
-	std::vector<std::string> b = getTitleFont(letters[1]);
-	std::vector<std::string> c = getTitleFont(letters[2]);
-	std::vector<std::string> d = getTitleFont(letters[3]);
-	std::vector<std::string> e = getTitleFont(letters[4]);
+	const int width = 100;
+	const int height = 30;
+	const int fps = 120;
+	float deltatime;
 
-	for (int i = 0; i < a.size(); i++) {
-		std::cout << a[i] << ' ' << b[i]<< ' ' << c[i]<< ' ' << d[i]<< ' ' << e[i] << std::endl;
+	Title gameName({ 'h', 'e', 'l', 'l', 'o' }, 1, 1, 2);
+	UI MainMenu;
+	Renderer renderer(width, height);
+	FpsManager fpsManager(fps);
+
+	MainMenu.addTitle(gameName);
+
+	while (true) {
+		renderer.clearBuffer();
+
+		MainMenu.draw();
+
+		deltatime = fpsManager.regulate();
+		renderer.drawBuffer();
 	}
-	return 0;
+
 };

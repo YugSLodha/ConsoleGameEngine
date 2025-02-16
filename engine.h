@@ -96,6 +96,48 @@ public:
 	}
 };
 
+class Title {
+	std::vector<std::string> title;
+	int xpos, ypos;
+	int color;
+
+public:
+	Title(std::vector<std::string>& title, int xpos, int ypos, int color) : title(title), xpos(xpos), ypos(ypos), color(color) {}
+};
+
+class UiElement {
+	std::vector<std::string> text;
+	int xpos, ypos;
+	int color;
+public:
+	UiElement(const std::vector<std::string>& text, int xpos, int ypos, int color) : text(text), xpos(xpos), ypos(ypos), color(color) {}
+};
+
+class UI {
+	std::vector<Title> titles;
+	std::vector<UiElement> elements;
+
+public:
+	void addTitle(Title title) {
+		titles.push_back(title);
+	}
+
+	void addElement(UiElement element) {
+		elements.push_back(element);
+	}
+
+	void draw() {
+		for (auto& title : titles) {
+			for (int i = 0; i < title.title.size(); i++) {
+				COORD coord = { static_cast<short>(title.xpos), static_cast<short>(title.ypos + i) };
+				SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+				SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), title.color);
+				std::cout << title.title[i];
+			}
+		}
+	}
+}:
+
 class PhysicsObject {
 public:
 	Sprite sprite;
