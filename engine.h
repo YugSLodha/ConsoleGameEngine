@@ -10,7 +10,6 @@
 #include <chrono>
 #include <thread>
 #include <conio.h>
-#include "bigfont.h"
 
 // COLOR CHART
 // 0	Black
@@ -29,39 +28,6 @@
 // 13	Light Purple
 // 14	Light Yellow
 // 15	Bright White
-
-std::vector<std::string> getTitleFont(char letter) {
-	letter = (char)tolower(letter);
-	switch (letter) {
-	case 'a': return a;
-	case 'b': return b;
-	case 'c': return c;
-	case 'd': return d;
-	case 'e': return e;
-	case 'f': return f;
-	case 'g': return g;
-	case 'h': return h;
-	case 'i': return i;
-	case 'j': return j;
-	case 'k': return k;
-	case 'l': return l;
-	case 'm': return m;
-	case 'n': return n;
-	case 'o': return o;
-	case 'p': return p;
-	case 'q': return q;
-	case 'r': return r;
-	case 's': return s;
-	case 't': return t;
-	case 'u': return u;
-	case 'v': return v;
-	case 'w': return w;
-	case 'x': return x;
-	case 'y': return y;
-	case 'z': return z;
-	default: return std::vector<std::string>();
-	}
-}
 
 // Utility Functions
 int randomNumber(int start, int end) {
@@ -89,91 +55,7 @@ public:
 		this->ypos = ypos;
 		this->color = color;
 	}
-
-	void move(int dx, int dy) {
-		xpos += dx;
-		ypos += dy;
-	}
 };
-
-class PhysicsObject {
-public:
-	Sprite sprite;
-	float velocityX, velocityY;
-	float mass;
-
-	// Constructor
-	PhysicsObject(Sprite gSprite, float mass, float velocityX = 0.0f, float velocityY = 0.0f)
-		: sprite(gSprite), mass(mass), velocityX(velocityX), velocityY(velocityY) {
-	}
-
-	// Update position based on velocity
-	void updatePosition(float deltaTime) {
-		sprite.xpos += velocityX * deltaTime;
-		sprite.ypos += velocityY * deltaTime;
-	}
-};
-
-// PhysicsEngine Class
-class PhysicsEngine {
-public:
-	float gravity = 9.8f;
-	float dampingFactor = 0.98f;
-
-	void applyGravity(PhysicsObject& object, float deltaTime) {
-		if (object.mass > 0) {
-			object.velocityY += gravity * deltaTime;
-			object.updatePosition(deltaTime);
-		}
-	}
-
-	void applyForce(PhysicsObject& object, float deltaTime, float forceX, float forceY) {
-		if (object.mass > 0) {
-			object.velocityX += (forceX / object.mass) * deltaTime;
-			object.velocityY += (forceY / object.mass) * deltaTime;
-		}
-	}
-
-	void applyDamping(PhysicsObject& object) {
-		object.velocityX *= dampingFactor;
-		object.velocityY *= dampingFactor;
-	}
-
-	void stopForces(PhysicsObject& physicsObject) {
-		physicsObject.velocityY = 0;  // Stop falling
-		physicsObject.velocityX = 0;  // Stop moving horizontally
-	}
-};
-
-// Background Class
-class Background {
-public:
-	std::vector<std::vector<std::pair<char, int>>> texture; // Each cell holds a character and its color
-	int width, height;
-
-	// Constructor to initialize the background with dimensions and optional default character and color
-	void setTexture(int width, int height, char defaultChar = ' ', int defaultColor = 7) {
-		this->width = width;
-		this->height = height;
-		texture.resize(height, std::vector<std::pair<char, int>>(width, { defaultChar, defaultColor }));
-	}
-
-	// Set a specific character and color at a given position
-	void setPixel(int x, int y, char ch, int color) {
-		if (x >= 0 && x < width && y >= 0 && y < height) {
-			texture[y][x] = { ch, color };
-		}
-	}
-
-	// Get the character and color at a specific position
-	std::pair<char, int> getPixel(int x, int y) const {
-		if (x >= 0 && x < width && y >= 0 && y < height) {
-			return texture[y][x];
-		}
-		return { ' ', 7 };
-	}
-};
-
 
 // Renderer Class
 class Renderer {
@@ -227,22 +109,6 @@ public:
 		for (int y = 0; y < sprite.height; ++y) {
 			for (int x = 0; x < sprite.width; ++x) {
 				drawChar(sprite.xpos + x, sprite.ypos + y, sprite.texture[y][x], sprite.color);
-			}
-		}
-	}
-
-	void drawBackground(const Background& background) {
-		for (int y = 0; y < background.height; ++y) {
-			for (int x = 0; x < background.width; ++x) {
-				// Retrieve the character and color from the background texture
-				auto pixel = background.getPixel(x, y);
-				char ch = pixel.first;
-				int color = pixel.second;
-
-				// Only update if the current pixel differs from the buffer
-				if (buffer[y][x].first != ch || buffer[y][x].second != color) {
-					drawChar(x, y, ch, color);  // Update the character and color at position (x, y)
-				}
 			}
 		}
 	}
