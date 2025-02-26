@@ -9,14 +9,14 @@ int main() {
 	Renderer renderer(width, height);
 	FPSManager fps(FPS);
 
+	clearScreen();
 	while (true) {
-		deltatime = fps.regulate();
-		clearScreen();
 		renderer.clearBuffer();
 
-		renderer.writeToBuffer('#', 2, 2, 13);
+		renderer.drawChar(2, 2, '*', 7);
 
 		renderer.drawBuffer();
+		deltatime = fps.regulate();
 	}
 	return 0;
 }

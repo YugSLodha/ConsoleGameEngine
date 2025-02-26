@@ -3,7 +3,7 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-
+#include <windows.h>
 
 void clearScreen() {
 	std::cout << "\033[2J\033[1;1H";
@@ -21,67 +21,67 @@ struct Pixel {
 	char letter;
 	int color;
 };
-
 class Renderer {
-private:
-	int width, height;
-	std::vector<std::vector<Pixel>> frontBuffer;
-    std::vector<std::vector<Pixel>> backBuffer;
-
-	// ANSI escape codes for basic colors
-	const std::vector<std::string> ANSI_COLORS = {
-		"\033[0m",    // Reset (default) 00
-		"\033[30m",   // BLack           01
-		"\033[31m",   // Red             02
-		"\033[32m",   // Green           03
-		"\033[33m",   // Yellow          04
-		"\033[34m",   // Blue            05
-		"\033[35m",   // Magenta         06
-		"\033[36m",   // Cyan            07
-		"\033[37m",   // White           08
-		"\033[90m",   // Grey            09
-		"\033[91m",   // Bright Red      10
-		"\033[92m",   // Bright Green    11
-		"\033[93m",   // Bright Yellow   12
-		"\033[94m",   // Bright Blue     13
-		"\033[95m",   // Bright Magenta  14
-		"\033[96m",   // Bright Cyan     15
-		"\033[97m",   // Bright White    16
-	};
-
+	private:
+		HANDLE consoleHandle;
+		int width, height;
+		std::vector<std::vector<Pixel>> backBuffer; // New frame buffer
+		std::vector<std::vector<Pixel>> frontBuffer; // Previous frame buffer
+	
 	public:
-    Renderer(int w, int h) : width(w), height(h), 
-        frontBuffer(h, std::vector<Pixel>(w, { ' ', 0 })), 
-        backBuffer(h, std::vector<Pixel>(w, { ' ', 0 })) {hideCursor();}
-
-    void clearBuffer() {
-        for (auto& row : backBuffer) {
-            for (auto& pixel : row) {
-                pixel = { ' ', 0 };  // Reset to space and default color
-            }
-        }
-    }
-
-    void writeToBuffer(char letter, int xpos, int ypos, int color) {
-        if (xpos >= 0 && xpos < width && ypos >= 0 && ypos < height) {
-            backBuffer[ypos][xpos] = { letter, color % static_cast<int>(ANSI_COLORS.size()) };  // Ensure valid color index
-        }
-    }
-
-    void drawBuffer() {
-        clearScreen();
-
-        for (const auto& row : frontBuffer) {
-            for (const auto& pixel : row) {
-                std::cout << ANSI_COLORS[pixel.color] << pixel.letter;
-            }
-            std::cout << "\033[0m\n";  // Reset color and move to the next line
-        }
-
-        // Swap buffers
-        frontBuffer.swap(backBuffer);
-    }
-};
+		Renderer(int w, int h) : width(w), height(h) {
+			consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	
+			// Hide cursor for smooth rendering
+			hideCursor();
+	
+			// Initialize double buffers
+			backBuffer.resize(height, std::vector<Pixel>(width, { ' ', 7 }));
+			frontBuffer.resize(height, std::vector<Pixel>(width, { ' ', 7 }));
+		}
+	
+		// Set cursor position in the console
+		void setCursorPosition(int x, int y) {
+			COORD position = { static_cast<SHORT>(x), static_cast<SHORT>(y) };
+			SetConsoleCursorPosition(consoleHandle, position);
+			std::cout.flush(); // Ensure cursor moves instantly
+		}
+	
+		// Draw the back buffer to the console, updating only changed pixels
+		void drawBuffer() {
+			setCursorPosition(0, 0);
+	
+			for (int y = 0; y < height; ++y) {
+				for (int x = 0; x < width; ++x) {
+					const Pixel& newPixel = backBuffer[y][x];
+					Pixel& oldPixel = frontBuffer[y][x];
+	
+					if (newPixel.letter != oldPixel.letter || newPixel.color != oldPixel.color) {
+						setCursorPosition(x, y);
+						SetConsoleTextAttribute(consoleHandle, newPixel.color);
+						std::cout << newPixel.letter;
+						oldPixel = newPixel; // Update front buffer
+					}
+				}
+			}
+			SetConsoleTextAttribute(consoleHandle, 7); // Reset color
+			std::cout.flush();
+		}
+	
+		// Clear the back buffer
+		void clearBuffer() {
+			for (auto& row : backBuffer) {
+				std::fill(row.begin(), row.end(), Pixel{ ' ', 7 });
+			}
+		}
+	
+		// Draw a single character with color at the given position
+		void drawChar(int x, int y, char ch, int color = 7) {
+			if (x >= 0 && x < width && y >= 0 && y < height) {
+				backBuffer[y][x] = { ch, color };
+			}
+		}
+	};
 
 class FPSManager {
 private:
