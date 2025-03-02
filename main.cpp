@@ -1,10 +1,10 @@
 #include "engine.h"
-#include <conio.h>
 
 int main() {
 	const int screenWidth = 139;
 	const int screenHeight = 30;
 	const int FPS = 60;
+	float deltatime;
 
 	Camera camera(0, 0);
 	Renderer renderer(screenWidth, screenHeight, &camera);
@@ -15,12 +15,11 @@ int main() {
 	hideCursor();  // Hide cursor at the start
 
 	// Start the timer (runs in the background without blocking)
-	timer.start(1, [&camera]() {
-		camera.move(1, 0);
-		});
+	timer.start(1, [&camera]() {camera.move(1, 0);}, true);
 
 	clearScreen();
 	while (running) {
+		deltatime = fpsManager.regulate();
 		renderer.clearBuffer();
 
 		// Handle keyboard input
@@ -35,8 +34,6 @@ int main() {
 
 		renderer.drawBorder('#', Color::BrightWhite);
 		renderer.drawBuffer();
-
-		deltatime = fpsManager.regulate();
 	}
 
 	// Stop timer before exiting

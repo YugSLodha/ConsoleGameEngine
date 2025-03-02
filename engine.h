@@ -160,21 +160,22 @@ public:
 
 class Timer {
 public:
-	Timer() : running(false) {}
+	Timer() : running(false), repeat(false) {}
 
 	~Timer() {
 		stop();
 	}
 
-	void start(int seconds, std::function<void()> callback) {
+	void start(int seconds, std::function<void()> callback, bool repeatTimer = false) {
 		stop(); // Ensure no existing timer is running
 
 		running = true;
+		repeat = repeatTimer;
 		timerThread = std::thread([this, seconds, callback]() {
-			while (running) {
+			do {
 				std::this_thread::sleep_for(std::chrono::seconds(seconds));
-				if (running) callback(); // Execute only if timer is still running
-			}
+				if (running) callback();
+			} while (running && repeat);
 			});
 
 		timerThread.detach(); // Detach to avoid blocking main thread
@@ -187,4 +188,6 @@ public:
 private:
 	std::thread timerThread;
 	std::atomic<bool> running;
+	std::atomic<bool> repeat;
 };
+
