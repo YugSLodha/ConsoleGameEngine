@@ -4,12 +4,16 @@
 #include <chrono>
 #include <thread>
 #include <windows.h>
+#include <functional>
+#include <atomic>
 
 // Utility Functions
 void hideCursor() { std::cout << "\033[?25l"; }
 void showCursor() { std::cout << "\033[?25h"; }
 
 void clearScreen() { std::cout << "\033[2J\033[1;1H"; }
+
+void timer(int seconds) { std::this_thread::sleep_for(std::chrono::seconds(seconds)); }
 
 struct Color {
 	static const int Black = 0;
@@ -152,4 +156,35 @@ public:
 		lastFrameTime = newTime;
 		return deltaTime;
 	}
+};
+
+class Timer {
+public:
+	Timer() : running(false) {}
+
+	~Timer() {
+		stop();
+	}
+
+	void start(int seconds, std::function<void()> callback) {
+		stop(); // Ensure no existing timer is running
+
+		running = true;
+		timerThread = std::thread([this, seconds, callback]() {
+			while (running) {
+				std::this_thread::sleep_for(std::chrono::seconds(seconds));
+				if (running) callback(); // Execute only if timer is still running
+			}
+			});
+
+		timerThread.detach(); // Detach to avoid blocking main thread
+	}
+
+	void stop() {
+		running = false; // Mark as stopped
+	}
+
+private:
+	std::thread timerThread;
+	std::atomic<bool> running;
 };

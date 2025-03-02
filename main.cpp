@@ -9,29 +9,39 @@ int main() {
 	Camera camera(0, 0);
 	Renderer renderer(screenWidth, screenHeight, &camera);
 	FPSManager fpsManager(FPS);
+	Timer timer;
 
 	bool running = true;
+	hideCursor();  // Hide cursor at the start
+
+	// Start the timer (runs in the background without blocking)
+	timer.start(1, [&camera]() {
+		camera.move(1, 0);
+		});
 
 	clearScreen();
 	while (running) {
-		if (_kbhit()) {
-			char key = _getch();
-			switch (key) {
-			case 'a': camera.move(-1, 0); break;
-			case 'd': camera.move(1, 0); break;
-			case 'q': running = false; break; // Quit
-			}
-		}
 		renderer.clearBuffer();
 
-		renderer.drawChar(Position(10, 10), '@', Color::Red);
-		renderer.drawChar(Position(8, 2), '%', Color::Yellow);
+		// Handle keyboard input
+		if (_kbhit()) {
+			char key = _getch();
+			if (key == 'q' || key == 'Q') running = false;
+		}
+
+		// Draw elements
+		renderer.drawChar(Position(19, 10), '@', Color::Red);
+		renderer.drawChar(Position(27, 2), '%', Color::Yellow);
 
 		renderer.drawBorder('#', Color::BrightWhite);
 		renderer.drawBuffer();
-		fpsManager.regulate();
+
+		deltatime = fpsManager.regulate();
 	}
 
-	showCursor(); // Restore cursor visibility
+	// Stop timer before exiting
+	timer.stop();
+	showCursor();  // Restore cursor visibility
+
 	return 0;
 }
