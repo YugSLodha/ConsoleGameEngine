@@ -13,8 +13,6 @@ void showCursor() { std::cout << "\033[?25h"; }
 
 void clearScreen() { std::cout << "\033[2J\033[1;1H"; }
 
-void timer(int seconds) { std::this_thread::sleep_for(std::chrono::seconds(seconds)); }
-
 struct Color {
 	static const int Black = 0;
 	static const int Blue = 1;
