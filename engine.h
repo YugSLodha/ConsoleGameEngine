@@ -158,18 +158,19 @@ public:
 
 class Timer {
 public:
-	Timer() : running(false), repeat(false) {}
+	Timer(int seconds, std::function<void()> callback, bool repeatTimer = false)
+		: seconds(seconds), callback(callback), repeat(repeatTimer), running(false) {
+	}
 
 	~Timer() {
 		stop();
 	}
 
-	void start(int seconds, std::function<void()> callback, bool repeatTimer = false) {
+	void start() {
 		stop(); // Ensure no existing timer is running
 
 		running = true;
-		repeat = repeatTimer;
-		timerThread = std::thread([this, seconds, callback]() {
+		timerThread = std::thread([this]() {
 			do {
 				std::this_thread::sleep_for(std::chrono::seconds(seconds));
 				if (running) callback();
@@ -184,8 +185,10 @@ public:
 	}
 
 private:
+	int seconds;
+	std::function<void()> callback;
+	bool repeat;
+	bool running;
 	std::thread timerThread;
-	std::atomic<bool> running;
-	std::atomic<bool> repeat;
 };
 

@@ -10,13 +10,13 @@ int main() {
 	Camera camera(0, 0);
 	Renderer renderer(screenWidth, screenHeight, &camera);
 	FPSManager fpsManager(FPS);
-	Timer timer;
+	Timer timer(1, [&camera]() {camera.move(1, 0);}, true);
 
 	bool running = true;
 	hideCursor();  // Hide cursor at the start
 
 	// Start the timer (runs in the background without blocking)
-	timer.start(1, [&camera]() {camera.move(1, 0);}, true);
+	timer.start();
 
 	clearScreen();
 	while (running) {
