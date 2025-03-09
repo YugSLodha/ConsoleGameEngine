@@ -164,6 +164,9 @@ public:
 
 	~Timer() {
 		stop();
+		if (timerThread.joinable()) {
+			timerThread.join();
+		}
 	}
 
 	void start() {
@@ -188,7 +191,44 @@ private:
 	int seconds;
 	std::function<void()> callback;
 	bool repeat;
-	bool running;
+	std::atomic<bool> running;
 	std::thread timerThread;
 };
 
+class Input {
+private:
+	std::unordered_map<int, bool> keyState; // Stores the state of each key
+
+public:
+	// Check if a specific key is currently being pressed
+	bool isKeyDown(int key) {
+		return (GetAsyncKeyState(key) & 0x8000) != 0;
+	}
+
+	// Check if a key was just pressed (i.e., not held down)
+	bool isKeyPressed(int key) {
+		bool currentlyPressed = isKeyDown(key);
+		if (currentlyPressed && !keyState[key]) {
+			keyState[key] = true;
+			return true;
+		}
+		return false;
+	}
+
+	// Check if a key was just released
+	bool isKeyReleased(int key) {
+		bool currentlyPressed = isKeyDown(key);
+		if (!currentlyPressed && keyState[key]) {
+			keyState[key] = false;
+			return true;
+		}
+		return false;
+	}
+
+	// Update the key state (call this in the game loop)
+	void update() {
+		for (auto& key : keyState) {
+			key.second = isKeyDown(key.first);
+		}
+	}
+};

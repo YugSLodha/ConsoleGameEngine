@@ -1,5 +1,4 @@
 #include "engine.h"
-#include <conio.h>
 
 int main() {
 	const int screenWidth = 139;
@@ -10,7 +9,8 @@ int main() {
 	Camera camera(0, 0);
 	Renderer renderer(screenWidth, screenHeight, &camera);
 	FPSManager fpsManager(FPS);
-	Timer timer(1, [&camera]() {camera.move(1, 0);}, true);
+	static Timer timer(1, [&camera]() {camera.move(1, 0);}, true);
+	Input inputHandler;
 
 	bool running = true;
 	hideCursor();  // Hide cursor at the start
@@ -22,12 +22,11 @@ int main() {
 	while (running) {
 		deltatime = fpsManager.regulate();
 		renderer.clearBuffer();
+		inputHandler.update();
 
 		// Handle keyboard input
-		if (_kbhit()) {
-			char key = _getch();
-			if (key == 'q' || key == 'Q') running = false;
-		}
+		if (inputHandler.isKeyPressed(VK_ESCAPE)) running = false;
+
 
 		// Draw elements
 		renderer.drawChar(Position(19, 10), '@', Color::Red);
@@ -39,6 +38,7 @@ int main() {
 
 	// Stop timer before exiting
 	timer.stop();
+	delete timer;
 	showCursor();  // Restore cursor visibility
 
 	return 0;
