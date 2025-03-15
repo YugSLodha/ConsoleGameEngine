@@ -70,7 +70,10 @@ class UI {
 public:
 	std::vector<UiElement> elements;
 
-	void addElement(const Position& pos, const std::string& text, int color) {
+	void addElement(const int x, const int y, const std::string& text, int color) {
+		Position pos;
+		pos.x = x;
+		pos.y = y;
 		elements.emplace_back(pos, text, color);
 	}
 
@@ -111,9 +114,9 @@ private:
 public:
 	Renderer(int w, int h, Camera* cam) : width(w), height(h), camera(cam) {
 		consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-		hideCursor();
 		backBuffer.resize(height, std::vector<Pixel>(width, Pixel()));
 		frontBuffer.resize(height, std::vector<Pixel>(width, Pixel()));
+		hideCursor();
 	}
 
 	void setCursorPosition(Position pos) {

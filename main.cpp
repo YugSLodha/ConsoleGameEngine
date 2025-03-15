@@ -1,51 +1,53 @@
 #include "engine.h"
-#include <conio.h> // For _kbhit() and _getch()
+#include <cmath>
 
 int main() {
-	// Initialize camera and renderer
-	Camera camera;
-	Renderer renderer(10, 10, &camera);
-	Input input;
-	Timer timer(10, [&renderer]() {renderer.setActiveScreen("nonMain");}, false);
-	timer.start();
+	const int width = 139;
+	const int height = 31;
+	const int FPS = 60;
+	float deltatime;
+	bool running = true;
 
-	// Define update function
-	auto update = [&]() {
+	Camera camera;
+	Renderer renderer(width, height, &camera);
+	Input input;
+	FPSManager fpsManager(FPS);
+
+	UI ui;
+	ui.addElement(floor((width - 11) / 2), 5, "Flappy Bird", Color::Yellow);
+	ui.addElement(floor((width - 21) / 2), 16, "Press <ENTER> to Play", Color::Yellow);
+	ui.addElement(floor((width - 23) / 2), 17, "Press <ESCAPE> to  Quit", Color::Yellow);
+
+	auto mmRender = [&]() {
+		renderer.clearBuffer();
+		renderer.drawBorder('#', Color::BrightWhite);
+		renderer.drawUI(ui);
+		renderer.drawBuffer();
+		};
+
+	auto mmUpdate = [&]() {
 		if (input.isKeyPressed(VK_ESCAPE)) {
-			exit(0); // Quit game on Escape key press
+			running = false;
+		}
+		if (input.isKeyPressed(VK_RETURN)) {
+			exit(0);
 		}
 		};
 
-	// Define render function
-	auto render = [&]() {
-		renderer.clearBuffer();
-		renderer.drawBorder('#', Color::White); // Draw border
-		renderer.drawChar(Position(3, 3), 'G', Color::Red); // Draw 'G' at (3,3)
-		renderer.drawBuffer();
-		};
+	auto mainMenu = std::make_shared<Screen>(mmUpdate, mmRender);
+	renderer.addScreen("mainMenu", mainMenu);
 
-	auto render2 = [&]() {
-		renderer.clearBuffer();
-		renderer.drawBorder('#', Color::White); // Draw border
-		renderer.drawChar(Position(3, 3), 'H', Color::Red); // Draw 'G' at (3,3)
-		renderer.drawBuffer();
-		};
-
-	// Create a screen and set it active
-	auto mainScreen = std::make_shared<Screen>(update, render);
-	auto aScreen = std::make_shared<Screen>(update, render2);
-	renderer.addScreen("main", mainScreen);
-	renderer.addScreen("nonMain", aScreen);
-	renderer.setActiveScreen("main");
-
-	// Game loop
+	renderer.setActiveScreen("mainMenu");
 	clearScreen();
-	while (true) {
+	while (running) {
 		input.update();
 		renderer.update();
 		renderer.render();
-		std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60 FPS
+		deltatime = fpsManager.regulate();
 	}
+
+	showCursor();
+	clearScreen();
 
 	return 0;
 }
