@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <functional>
 #include <atomic>
+#include <memory>
 
 // Utility Functions
 void hideCursor() { std::cout << "\033[?25l"; }
@@ -47,16 +48,23 @@ struct Pixel {
 	Pixel(char letter = ' ', int color = Color::White) : letter(letter), color(color) {}
 };
 
-// 🎥 Camera Class
+// Screen Class
+class Screen {
+public:
+	std::function<void()> update;
+	std::function<void()> render;
+	Screen(std::function<void()> updateFunc, std::function<void()> renderFunc)
+		: update(updateFunc), render(renderFunc) {
+	}
+};
+
+// Camera Class
 class Camera {
 private:
 	Position position;
-
 public:
 	Camera(int startX = 0, int startY = 0) : position(startX, startY) {}
-
 	void move(int dx, int dy) { position.x += dx; position.y += dy; }
-
 	Position getPosition() const { return position; }
 };
 
@@ -68,6 +76,8 @@ private:
 	std::vector<std::vector<Pixel>> backBuffer;
 	std::vector<std::vector<Pixel>> frontBuffer;
 	Camera* camera;
+	std::unordered_map<std::string, std::shared_ptr<Screen>> screens;
+	std::shared_ptr<Screen> activeScreen;
 
 public:
 	Renderer(int w, int h, Camera* cam) : width(w), height(h), camera(cam) {
@@ -96,12 +106,10 @@ public:
 
 	void drawBuffer() {
 		setCursorPosition(Position(0, 0));
-
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
 				const Pixel& newPixel = backBuffer[y][x];
 				Pixel& oldPixel = frontBuffer[y][x];
-
 				if (newPixel.letter != oldPixel.letter || newPixel.color != oldPixel.color) {
 					setCursorPosition(Position(x, y));
 					SetConsoleTextAttribute(consoleHandle, newPixel.color);
@@ -124,10 +132,27 @@ public:
 
 	void drawChar(Position worldPos, char ch, int color = Color::White) {
 		Position screenPos = worldPos + Position(-camera->getPosition().x, -camera->getPosition().y);
-
 		if (screenPos.x > 0 && screenPos.x < width - 1 && screenPos.y > 0 && screenPos.y < height - 1) {
 			backBuffer[screenPos.y][screenPos.x] = Pixel(ch, color);
 		}
+	}
+
+	void addScreen(const std::string& name, std::shared_ptr<Screen> screen) {
+		screens[name] = screen;
+	}
+
+	void setActiveScreen(const std::string& name) {
+		if (screens.find(name) != screens.end()) {
+			activeScreen = screens[name];
+		}
+	}
+
+	void update() {
+		if (activeScreen) activeScreen->update();
+	}
+
+	void render() {
+		if (activeScreen) activeScreen->render();
 	}
 };
 

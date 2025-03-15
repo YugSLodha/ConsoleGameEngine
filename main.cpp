@@ -1,45 +1,40 @@
 #include "engine.h"
+#include <conio.h> // For _kbhit() and _getch()
 
 int main() {
-	const int screenWidth = 139;
-	const int screenHeight = 30;
-	const int FPS = 60;
-	float deltatime;
+	// Initialize camera and renderer
+	Camera camera;
+	Renderer renderer(10, 10, &camera);
+	Input input;
 
-	Camera camera(0, 0);
-	Renderer renderer(screenWidth, screenHeight, &camera);
-	FPSManager fpsManager(FPS);
-	static Timer timer(1, [&camera]() {camera.move(1, 0);}, true);
-	Input inputHandler;
+	// Define update function
+	auto update = [&]() {
+		if (input.isKeyPressed(VK_ESCAPE)) {
+			exit(0); // Quit game on Escape key press
+		}
+		};
 
-	bool running = true;
-	hideCursor();  // Hide cursor at the start
-
-	// Start the timer (runs in the background without blocking)
-	timer.start();
-
-	clearScreen();
-	while (running) {
-		deltatime = fpsManager.regulate();
+	// Define render function
+	auto render = [&]() {
 		renderer.clearBuffer();
-		inputHandler.update();
-
-		// Handle keyboard input
-		if (inputHandler.isKeyPressed(VK_ESCAPE)) running = false;
-
-
-		// Draw elements
-		renderer.drawChar(Position(19, 10), '@', Color::Red);
-		renderer.drawChar(Position(27, 2), '%', Color::Yellow);
-
-		renderer.drawBorder('#', Color::BrightWhite);
+		renderer.drawBorder('#', Color::White); // Draw border
+		renderer.drawChar(Position(3, 3), 'G', Color::Red); // Draw 'G' at (3,3)
 		renderer.drawBuffer();
-	}
+		};
 
-	// Stop timer before exiting
-	timer.stop();
-	delete timer;
-	showCursor();  // Restore cursor visibility
+	// Create a screen and set it active
+	auto mainScreen = std::make_shared<Screen>(update, render);
+	renderer.addScreen("main", mainScreen);
+	renderer.setActiveScreen("main");
+
+	// Game loop
+	clearScreen();
+	while (true) {
+		input.update();
+		renderer.update();
+		renderer.render();
+		std::this_thread::sleep_for(std::chrono::milliseconds(16)); // ~60 FPS
+	}
 
 	return 0;
 }
