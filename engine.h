@@ -58,6 +58,35 @@ public:
 	}
 };
 
+class UiElement {
+public:
+	Position position;
+	std::string text;
+	int color;
+	UiElement(Position pos, std::string text, int color) : position(pos), text(text), color(color) {}
+};
+
+class UI {
+public:
+	std::vector<UiElement> elements;
+
+	void addElement(const Position& pos, const std::string& text, int color) {
+		elements.emplace_back(pos, text, color);
+	}
+
+	void clear() {
+		elements.clear();
+	}
+
+	void updateElement(int index, const std::string& newText, int newColor) {
+		if (index >= 0 && index < elements.size()) {
+			elements[index].text = newText;
+			elements[index].color = newColor;
+		}
+	}
+};
+
+
 // Camera Class
 class Camera {
 private:
@@ -134,6 +163,16 @@ public:
 		Position screenPos = worldPos + Position(-camera->getPosition().x, -camera->getPosition().y);
 		if (screenPos.x > 0 && screenPos.x < width - 1 && screenPos.y > 0 && screenPos.y < height - 1) {
 			backBuffer[screenPos.y][screenPos.x] = Pixel(ch, color);
+		}
+	}
+
+	void drawUI(const UI& ui) {
+		for (const auto& element : ui.elements) {
+			Position pos = element.position;
+			for (char ch : element.text) {
+				drawChar(pos, ch, element.color);
+				pos.x++; // Move to the right for the next character
+			}
 		}
 	}
 

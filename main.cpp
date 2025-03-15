@@ -24,14 +24,15 @@ int main() {
 		renderer.drawBuffer();
 		};
 
-	// Create a screen and set it active
-	auto mainScreen = std::make_shared<Screen>(update, render);
 	auto render2 = [&]() {
 		renderer.clearBuffer();
 		renderer.drawBorder('#', Color::White); // Draw border
 		renderer.drawChar(Position(3, 3), 'H', Color::Red); // Draw 'G' at (3,3)
 		renderer.drawBuffer();
 		};
+
+	// Create a screen and set it active
+	auto mainScreen = std::make_shared<Screen>(update, render);
 	auto aScreen = std::make_shared<Screen>(update, render2);
 	renderer.addScreen("main", mainScreen);
 	renderer.addScreen("nonMain", aScreen);
