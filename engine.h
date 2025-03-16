@@ -7,12 +7,43 @@
 #include <functional>
 #include <atomic>
 #include <memory>
+#include <shellapi.h>
 
 // Utility Functions
 void hideCursor() { std::cout << "\033[?25l"; }
 void showCursor() { std::cout << "\033[?25h"; }
 
 void clearScreen() { std::cout << "\033[2J\033[1;1H"; }
+
+void runAsAdmin() {
+	// Check if already running as admin
+	BOOL isAdmin = FALSE;
+	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+	PSID adminGroup;
+
+	if (AllocateAndInitializeSid(&NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_ADMINS,
+		0, 0, 0, 0, 0, 0, &adminGroup)) {
+		CheckTokenMembership(NULL, adminGroup, &isAdmin);
+		FreeSid(adminGroup);
+	}
+
+	// Relaunch as admin if not already running as one
+	if (!isAdmin) {
+		wchar_t exePath[MAX_PATH];
+		GetModuleFileNameW(NULL, exePath, MAX_PATH);
+
+		SHELLEXECUTEINFOW sei = { sizeof(sei) };
+		sei.lpVerb = L"runas";  // "runas" triggers UAC
+		sei.lpFile = exePath;
+		sei.nShow = SW_SHOWNORMAL;
+
+		if (!ShellExecuteExW(&sei)) {
+			MessageBoxW(NULL, L"Failed to run as administrator!", L"Error", MB_OK | MB_ICONERROR);
+		}
+
+		exit(0); // Close current instance
+	}
+}
 
 struct Color {
 	static const int Black = 0;
@@ -51,10 +82,9 @@ struct Pixel {
 // Screen Class
 class Screen {
 public:
-	std::function<void()> update;
-	std::function<void()> render;
-	Screen(std::function<void()> updateFunc, std::function<void()> renderFunc)
-		: update(updateFunc), render(renderFunc) {
+	std::function<void()> loop;
+	Screen(std::function<void()> loopFunc)
+		: loop(loopFunc){
 	}
 };
 
@@ -189,12 +219,8 @@ public:
 		}
 	}
 
-	void update() {
-		if (activeScreen) activeScreen->update();
-	}
-
-	void render() {
-		if (activeScreen) activeScreen->render();
+	void loop() {
+		if (activeScreen) { activeScreen->loop(); }
 	}
 };
 
