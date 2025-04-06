@@ -5,7 +5,7 @@ int main() {
 	int width = 139;
 	int height = 30;
 	// TODO: MAKE DYNAMIC WIDTH AND HEIGHT
-	const int FPS = 60;
+	const int FPS = 120;
 	float deltatime;
 	bool running = true;
 	const std::vector<std::vector<char>> spriteText = { {' ', '_', ' '},
