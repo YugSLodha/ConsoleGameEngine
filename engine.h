@@ -84,7 +84,23 @@ class Screen {
 public:
 	std::function<void()> loop;
 	Screen(std::function<void()> loopFunc)
-		: loop(loopFunc){
+		: loop(loopFunc) {
+	}
+};
+
+class Sprite {
+public:
+	std::vector<std::vector<Pixel>> texture;
+
+	void setTextureSolidCol(std::vector<std::vector<char>> textureA, int color) {
+		for (int i = 0;i < textureA.size();i++) {
+			std::vector<Pixel> row;
+			for (int j = 0;j < textureA[i].size();j++) {
+				Pixel pix(textureA[i][j], color);
+				row.push_back(pix);
+			}
+			texture.push_back(row);
+		}
 	}
 };
 
@@ -209,6 +225,14 @@ public:
 		}
 	}
 
+	void drawSprite(Sprite sprite, Position pos) {
+		for (int i = 0; i < sprite.texture.size(); ++i) {
+			for (int j = 0; j < sprite.texture[i].size(); ++j) {
+				drawChar(pos + Position(j, i), sprite.texture[i][j].letter, sprite.texture[i][j].color);
+			}
+		}
+	}
+
 	void addScreen(const std::string& name, std::shared_ptr<Screen> screen) {
 		screens[name] = screen;
 	}
@@ -222,6 +246,16 @@ public:
 	void loop() {
 		if (activeScreen) { activeScreen->loop(); }
 	}
+
+	void clearAll() {
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
+				backBuffer[y][x] = Pixel();
+				frontBuffer[y][x] = Pixel();
+			}
+		}
+	}
+
 };
 
 // ⏳ FPS Manager Class
