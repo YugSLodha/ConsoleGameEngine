@@ -60,6 +60,13 @@
 		"text_encoding": "cpp",
 		"typeinfo": "cpp",
 		"variant": "cpp",
-		"cinttypes": "cpp"
+		"cinttypes": "cpp",
+		"any": "cpp",
+		"fstream": "cpp",
+		"codecvt": "cpp",
+		"forward_list": "cpp",
+		"map": "cpp",
+		"ranges": "cpp",
+		"valarray": "cpp"
 	}
 }

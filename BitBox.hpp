@@ -1,5 +1,5 @@
 // THE BITBOX ENGINE
-// V-0.3
+// V - 0.7 - IN WORKS
 // ALL RIGHTS RESERVED
 #pragma once
 #include <vector>
@@ -11,6 +11,12 @@
 #include <atomic>
 #include <memory>
 #include <shellapi.h>
+#include "libraries/json.hpp"
+#include <fstream>
+#include <string>
+#include <variant>
+using json = nlohmann::json;
+
 
 // Utility Functions
 void hideCursor() { std::cout << "\033[?25l"; }
@@ -301,8 +307,7 @@ public:
 	}
 
 	void start() {
-		stop(); // Ensure no existing timer is running
-
+		stop();
 		running = true;
 		timerThread = std::thread([this]() {
 			do {
@@ -310,12 +315,11 @@ public:
 				if (running) callback();
 			} while (running && repeat);
 			});
-
-		timerThread.detach(); // Detach to avoid blocking main thread
 	}
 
 	void stop() {
-		running = false; // Mark as stopped
+		running = false;
+		if (timerThread.joinable()) timerThread.join();
 	}
 
 private:
@@ -336,16 +340,6 @@ public:
 		return (GetAsyncKeyState(key) & 0x8000) != 0;
 	}
 
-	// Check if a key was just pressed (i.e., not held down)
-	bool isKeyPressed(int key) {
-		bool currentlyPressed = isKeyDown(key);
-		if (currentlyPressed && !keyState[key]) {
-			keyState[key] = true;
-			return true;
-		}
-		return false;
-	}
-
 	// Check if a key was just released
 	bool isKeyReleased(int key) {
 		bool currentlyPressed = isKeyDown(key);
@@ -363,3 +357,45 @@ public:
 		}
 	}
 };
+
+struct DataItem {
+	std::string name;
+	std::variant<int, float, bool, std::string> value;
+};
+
+void saveData(const std::vector<DataItem>& data, const std::string& path) {
+	json j;
+	for (const auto& item : data) {
+		std::visit([&](auto&& val) {
+			j[item.name] = val;
+			}, item.value);
+	}
+	std::ofstream file(path);
+	file << j.dump(4); // pretty print
+}
+
+
+std::vector<DataItem> loadData(const std::string& path) {
+	std::vector<DataItem> data;
+	std::ifstream file(path);
+	if (!file.is_open()) return data;
+
+	json j;
+	file >> j;
+
+	for (auto& [key, val] : j.items()) {
+		if (val.is_number_integer()) {
+			data.push_back({ key, val.get<int>() });
+		}
+		else if (val.is_number_float()) {
+			data.push_back({ key, val.get<float>() });
+		}
+		else if (val.is_boolean()) {
+			data.push_back({ key, val.get<bool>() });
+		}
+		else if (val.is_string()) {
+			data.push_back({ key, val.get<std::string>() });
+		}
+	}
+	return data;
+}

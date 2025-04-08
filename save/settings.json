@@ -1,0 +1,12 @@
+{
+    "autoFire": false,
+    "borderStyle": "#",
+    "difficulty": "MEDIUM",
+    "hitFlash": true,
+    "musicEnabled": false,
+    "playerCharacter": "O",
+    "playerColor": 4,
+    "screenShake": true,
+    "soundEnabled": true,
+    "volume": 100
+}
