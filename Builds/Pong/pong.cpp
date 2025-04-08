@@ -45,6 +45,7 @@ int main() {
 	float ballY = height / 2.0f;
 	int ballWidth = ballText.size();
 	int ballHeight = ballText[0].size();
+	float speedMultiplier = 1.0f + 0.1f * std::max(p1Score, p2Score);
 
 	UI gameUI;
 	gameUI.addElement(1, 1, "P1: 00", Color::BrightRed);
@@ -125,8 +126,8 @@ int main() {
 		if (ySpritePosP2 < 1) ySpritePosP2 = 1;
 		if (ySpritePosP2 > maxY) ySpritePosP2 = maxY;
 
-		ballX += ballSpeedX * deltatime;
-		ballY += ballSpeedY * deltatime;
+		ballX += ballSpeedX * deltatime * speedMultiplier;
+		ballY += ballSpeedY * deltatime * speedMultiplier;
 
 		if (ballY <= 1) {
 			ballY = 1;
