@@ -41,7 +41,6 @@ int main() {
 			running = false;
 		}
 
-
 		renderer.drawBuffer();
 		};
 	auto mainMenuScreen = std::make_shared<Screen>(mainMenuLoop);

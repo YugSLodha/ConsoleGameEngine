@@ -1,3 +1,6 @@
+// THE BITBOX ENGINE
+// V-0.3
+// ALL RIGHTS RESERVED
 #pragma once
 #include <vector>
 #include <iostream>

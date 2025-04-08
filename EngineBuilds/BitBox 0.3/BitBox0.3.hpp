@@ -1,3 +1,6 @@
+// THE BITBOX ENGINE
+// V-0.3
+// ALL RIGHTS RESERVED
 #pragma once
 #include <vector>
 #include <iostream>
@@ -9,14 +12,12 @@
 #include <memory>
 #include <shellapi.h>
 
-// Utility Functions
 void hideCursor() { std::cout << "\033[?25l"; }
 void showCursor() { std::cout << "\033[?25h"; }
 
 void clearScreen() { std::cout << "\033[2J\033[1;1H"; }
 
 void runAsAdmin() {
-	// Check if already running as admin
 	BOOL isAdmin = FALSE;
 	SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
 	PSID adminGroup;
@@ -27,7 +28,6 @@ void runAsAdmin() {
 		FreeSid(adminGroup);
 	}
 
-	// Relaunch as admin if not already running as one
 	if (!isAdmin) {
 		wchar_t exePath[MAX_PATH];
 		GetModuleFileNameW(NULL, exePath, MAX_PATH);
@@ -71,6 +71,10 @@ struct Position {
 	Position operator+(const Position& other) const {
 		return Position(x + other.x, y + other.y);
 	}
+
+	Position operator+(const Position& other) const {
+		return Position(x - other.x, y - other.y);
+	}
 };
 
 struct Pixel {
@@ -79,7 +83,6 @@ struct Pixel {
 	Pixel(char letter = ' ', int color = Color::White) : letter(letter), color(color) {}
 };
 
-// Screen Class
 class Screen {
 public:
 	std::function<void()> loop;
@@ -136,8 +139,6 @@ public:
 	}
 };
 
-
-// Camera Class
 class Camera {
 private:
 	Position position;
@@ -147,7 +148,6 @@ public:
 	Position getPosition() const { return position; }
 };
 
-// 🎨 Renderer Class
 class Renderer {
 private:
 	HANDLE consoleHandle;
@@ -259,7 +259,6 @@ public:
 
 };
 
-// ⏳ FPS Manager Class
 class FPSManager {
 private:
 	int targetFPS;
